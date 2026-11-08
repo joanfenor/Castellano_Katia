@@ -795,6 +795,7 @@ function applyLang(){
   langEs.setAttribute('aria-pressed',lang==='es');langUk.setAttribute('aria-pressed',lang==='uk');
   paintScore();drawDTopics();drawTheory();drawSTopics();drawDialog();if(Q&&Q.it)renderQ();
 }
+addEventListener('kc-sound',e=>{sound=e.detail;if(sound)SND.ok()});
 langEs.onclick=()=>{lang='es';store.set('lang','es');applyLang()};langUk.onclick=()=>{lang='uk';store.set('lang','uk');applyLang()};
 applyLang();newQ();paintFace();
 if(store.get('gtab',false))setTab(true);

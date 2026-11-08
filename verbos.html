@@ -332,7 +332,6 @@ footer{color:var(--muted);font-size:13px;padding-block:30px 40px}
         <div>
           <h3 data-i18n="hGame">Juego</h3>
           <div style="display:grid;gap:8px;justify-items:start">
-            <button class="chip" id="sndBtn" aria-pressed="true">Sonido activado</button>
             <button class="linkbtn" id="resetPts">Empezar de cero</button>
           </div>
         </div>
@@ -1152,9 +1151,9 @@ function rerender(){
 function stopTimer(){if(typeof T==='undefined')return;if(T.running){T.running=false;clearInterval(T.int)}qToken++}
 
 /* controles del juego */
-function paintSnd(){sndBtn.setAttribute('aria-pressed',sound);sndBtn.textContent=sound?t('sndOn'):t('sndOff')}
+function paintSnd(){}
 paintSnd();
-sndBtn.onclick=()=>{sound=!sound;store.set('sound',sound);paintSnd();if(sound)SND.ok()};
+addEventListener('kc-sound',e=>{sound=e.detail;if(sound)SND.ok()});
 let armed=0,armT=0;
 resetPts.onclick=()=>{
   if(!armed){armed=1;resetPts.textContent=t('resetSure');clearTimeout(armT);armT=setTimeout(()=>{armed=0;resetPts.textContent=t('reset')},3500);return}

@@ -23,6 +23,12 @@ st.textContent=`.kc-toast{position:fixed;left:50%;bottom:calc(18px + env(safe-ar
 .kc-daily .kb i{display:block;height:100%;background:#ffd700}
 .kc-daily a{color:#ffd700;font-weight:700;text-decoration:none}
 .kc-rep{font:600 12.5px Figtree,system-ui,sans-serif;background:none;border:0;color:var(--muted,#667);text-decoration:underline;cursor:pointer;padding:0;justify-self:start}`;
+st.textContent+=`
+.kc-hdr{display:flex;gap:8px;align-items:center}
+.kc-snd{width:44px;height:44px;border-radius:50%;border:0;background:var(--card,#fff);color:var(--tile,#2747a8);box-shadow:0 4px 16px rgba(0,30,80,.18);display:grid;place-items:center;cursor:pointer;flex:none}
+.kc-snd svg{width:22px;height:22px}
+.kc-snd[aria-pressed="false"]{color:var(--muted,#667)}
+.kc-snd:focus-visible{outline:3px solid #ffd700;outline-offset:2px}`;
 document.head.appendChild(st);
 let toastQ=[],toasting=false;
 function toast(html){toastQ.push(html);if(!toasting)nextToast()}
@@ -145,6 +151,20 @@ async function loadExtra(){
     const head=rows.shift().map(h=>h.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''));
     const items=rows.map(r=>Object.fromEntries(head.map((h,i)=>[h,(r[i]||'').trim()])));
     set('extra',items);return true}catch(e){return false}}
+
+
+/* ---------- botón de sonido junto al idioma ---------- */
+const ICON_ON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>';
+const ICON_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 5 6M21 9l-5 6"/></svg>';
+function mountSound(){
+  const lg=document.querySelector('header .lang');if(!lg||document.querySelector('.kc-snd'))return;
+  const box=document.createElement('div');box.className='kc-hdr';lg.parentNode.insertBefore(box,lg);
+  const b=document.createElement('button');b.className='kc-snd';box.appendChild(b);box.appendChild(lg);
+  const paint=()=>{const on=get('sound',true);b.setAttribute('aria-pressed',on);b.innerHTML=on?ICON_ON:ICON_OFF;b.setAttribute('aria-label',on?L('Sonido activado','Звук увімкнено'):L('Sonido desactivado','Звук вимкнено'))};
+  b.onclick=()=>{const on=!get('sound',true);set('sound',on);paint();dispatchEvent(new CustomEvent('kc-sound',{detail:on}))};
+  paint();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mountSound);else mountSound();
 
 window.KC={get,set,L,lang,today,GOAL,days,todayCount,streak,hit,badges,checkBadges,stats,toast,
   dailyStart,dailyActive,dailyBar,dailyTick,daily,canSpeak,say,canListen:!!SR,listen,report,backup,restore,extra,loadExtra,parseCSV};

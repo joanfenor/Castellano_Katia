@@ -8,5 +8,5 @@ const KATIA_CONFIG = {
   // 2) Tu número de WhatsApp para recibir los avisos de «Esta traducción está mal».
   //    Con prefijo de país y sin espacios ni «+», por ejemplo '34600111222'.
   //    Si lo dejas vacío, WhatsApp le preguntará a quién enviarlo.
-  whatsapp: '34628295557'
+  whatsapp: ''
 };
