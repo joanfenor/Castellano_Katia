@@ -352,6 +352,13 @@ header .wrap.hdr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;
 .hellohome .bar{height:8px}
 .hellohome .note{font-size:11.5px;margin:4px 0 0;line-height:1.3}
 @media (max-width:420px){.hellohome .face{width:58px;height:58px}.hdr .hello{padding:10px 12px}}
+
+.hellohome{display:block!important}
+.htop{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.htitle{min-width:0}
+.htop .face{width:60px;height:60px;flex:none;border-width:2px}
+@media (max-width:420px){.htop .face{width:52px;height:52px}}
+.today{margin-top:16px}
 </style>
 </head>
 <body>
@@ -368,14 +375,13 @@ header .wrap.hdr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;
 <header>
   <div class="wrap hdr">
     <div class="hello hellohome">
-      <div class="face" id="face" aria-hidden="true"></div>
-      <div class="htext">
-        <div class="eyebrow" data-i18n="eyebrow">El español de Katia</div>
-        <h1 data-i18n-html="hello">¡Hola, <em>Katia</em>!</h1>
-        <div class="lvl"><span id="lvlName">Nivel 1</span><span class="pts" id="lvlPts">0 / 150</span></div>
-        <div class="bar"><i id="lvlFill"></i></div>
-        <p class="note" id="nextGift"></p>
+      <div class="htop">
+        <div class="htitle"><div class="eyebrow" data-i18n="eyebrow">El español de Katia</div><h1 data-i18n-html="hello">¡Hola, <em>Katia</em>!</h1></div>
+        <div class="face" id="face" aria-hidden="true"></div>
       </div>
+      <div class="lvl"><span id="lvlName">Nivel 1</span><span class="pts" id="lvlPts">0 / 150</span></div>
+      <div class="bar"><i id="lvlFill"></i></div>
+      <p class="note" id="nextGift"></p>
     </div>
     <div class="hdrside">
       <div class="lang" role="group" aria-label="Idioma / Мова">
