@@ -315,25 +315,38 @@ header .wrap.hdr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;
 .hellohome .bar{height:8px}
 .hellohome .note{font-size:11.5px;margin:4px 0 0;line-height:1.3}
 @media (max-width:420px){.hellohome .face{width:58px;height:58px}.hdr .hello{padding:10px 12px}}
+
+.htop{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.htitle{min-width:0}
+.htop .face{width:64px;height:64px;flex:none;border-width:2px}
+.hdr h1{font-size:clamp(26px,7vw,34px);line-height:1.05}
+.hellohome{display:block!important}
+.hellohome .lvl{font-size:12.5px;margin:8px 0 4px;gap:6px;display:flex;justify-content:space-between;flex-wrap:wrap}
+.hellohome .bar{height:8px}
+.hellohome .note{font-size:11.5px;margin:4px 0 0;line-height:1.3;min-height:2.6em}
+.hellohome .combo{font-size:11px;padding:1px 8px;margin-left:6px}
+@media (max-width:420px){.htop .face{width:56px;height:56px}}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap hdr">
-    <div class="hello">
-      <div class="eyebrow" data-i18n="eyebrow">Vocabulario de español</div>
-      <h1 data-i18n-html="hello">¡Hola, <em>Katia</em>!</h1>
-      <div class="stats" aria-live="polite">
-      <div class="stat"><b id="sPts">0</b><span data-i18n="stPts">puntos</span></div>
-      <div class="stat"><b id="sOk">0</b><span data-i18n="stOk">aciertos hoy</span></div>
-      <div class="stat"><b id="sStreak">0</b><span data-i18n="stStreak">racha</span></div>
-      <div class="stat"><b id="sBest">0</b><span data-i18n="stBest">mejor racha</span></div>
-    </div>
+    <div class="hello hellohome">
+      <div class="htop">
+        <div class="htitle"><div class="eyebrow" data-i18n="eyebrow">Vocabulario</div><h1 data-i18n-html="hello">¡Hola,<br><em>Katia</em>!</h1></div>
+        <div class="face" id="face" aria-hidden="true"></div>
+      </div>
+      <div class="lvl"><span><span id="lvlName">Nivel 1</span><span id="combo" class="combo" hidden>×2</span></span><span class="pts" id="lvlPts">0 / 150</span></div>
+      <div class="bar"><i id="lvlFill"></i></div>
+      <p class="note" id="nextGift"></p>
+      <div class="stats" hidden>
+        <b id="sPts">0</b><b id="sOk">0</b><b id="sStreak">0</b><b id="sBest">0</b>
+      </div>
     </div>
     <div class="hdrside">
       <div class="lang" role="group" aria-label="Idioma / Мова">
-      <button id="langEs" aria-pressed="true">Español</button><button id="langUk" aria-pressed="false" lang="uk">Українська</button>
-    </div>
+        <button id="langEs" aria-pressed="true">Español</button><button id="langUk" aria-pressed="false" lang="uk">Українська</button>
+      </div>
       <div class="hdrbtns"><a class="homebtn" href="./" aria-label="Inicio" title="Inicio"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg></a></div>
     </div>
   </div>
@@ -357,11 +370,7 @@ header .wrap.hdr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;
       <div>
         <div class="modes" role="group" aria-label="Juego" id="modes"></div>
         <div class="selinfo"><span id="selInfo"></span><button class="linkbtn" id="selChange" data-i18n="change">Cambiar</button></div>
-        <div class="hud"><div class="face" id="face" aria-hidden="true"></div>
-        <div class="levelbar">
-          <div class="lvl"><span><span id="lvlName">Nivel 1</span><span id="combo" class="combo" hidden>×2</span></span><span class="pts" id="lvlPts">0 / 150</span></div>
-          <div class="bar"><i id="lvlFill"></i></div>
-        </div></div>
+        
         <div class="card" id="exercise"></div>
       </div>
       <aside class="settings card" id="settings">
@@ -395,7 +404,7 @@ const sPts=$('sPts'),sOk=$('sOk'),sStreak=$('sStreak'),sBest=$('sBest'),lvlName=
   viewW=$('viewW'),viewP=$('viewP'),tabW=$('tabW'),tabP=$('tabP'),topicSel=$('topicSel'),selInfo=$('selInfo'),langEs=$('langEs'),langUk=$('langUk');
 const ukN=(n,a,b,c)=>{const m10=n%10,m100=n%100;return m10===1&&m100!==11?a:(m10>=2&&m10<=4&&(m100<12||m100>14)?b:c)};
 const I18N={
- es:{home:'‹ Inicio',title:'El vocabulario de Katia',eyebrow:'Vocabulario de español',hello:'¡Hola, <em>Katia</em>!',sub:'Más de 1.250 palabras del día a día, con juegos para que se queden.',
+ es:{home:'‹ Inicio',title:'El vocabulario de Katia',eyebrow:'Vocabulario',hello:'¡Hola,<br><em>Katia</em>!',sub:'Más de 1.250 palabras del día a día, con juegos para que se queden.',
   stPts:'puntos',stOk:'aciertos hoy',stStreak:'racha',stBest:'mejor racha',tabW:'Palabras',tabP:'Practicar',search:'Buscar palabra…',
   hard:'Mis palabras difíciles',mastered:(n,tot)=>`${n} de ${tot} dominadas`,noHard:'Todavía no hay palabras difíciles. Las que falles aparecerán aquí.',noFound:'No encuentro esa palabra.',
   results:n=>`${n} resultados`,listen:'Escuchar',
@@ -419,7 +428,7 @@ const I18N={
   tRec:n=>`Tu récord: <b>${n}</b> puntos`,tGo:'¡Empezar!',tEnd:'¡Tiempo!',tSum:(p,c)=>`puntos · ${c} ${c===1?'acierto':'aciertos'}`,
   tNew:'¡Nuevo récord, Katia! 🌻',tKeep:n=>`Tu récord sigue en ${n} puntos. ¡A por él!`,tAgain:'Otra vez',skip:'Toca para empezar',
   splash:['Cada palabra nueva es una puerta abierta. ¡Tú puedes!','Hoy vas a aprender palabras nuevas. ¡Vamos allá!','Poco a poco, el español ya es tuyo. ¡Ánimo!','Equivocarse también es aprender. ¡A por ello!']},
- uk:{home:'‹ Головна',title:'Словник Каті',eyebrow:'Іспанська лексика',hello:'Привіт, <em>Катю</em>!',sub:'Понад 1250 слів на кожен день та ігри, щоб вони запам’ятовувалися.',
+ uk:{home:'‹ Головна',title:'Словник Каті',eyebrow:'Слова',hello:'Привіт,<br><em>Катю</em>!',sub:'Понад 1250 слів на кожен день та ігри, щоб вони запам’ятовувалися.',
   stPts:'бали',stOk:'правильних сьогодні',stStreak:'серія',stBest:'найкраща серія',tabW:'Слова',tabP:'Практика',search:'Пошук слова…',
   hard:'Мої складні слова',mastered:(n,tot)=>`${n} з ${tot} вивчено`,noHard:'Складних слів поки немає. Тут з’являться ті, в яких ти помилишся.',noFound:'Такого слова не знайдено.',
   results:n=>`Знайдено: ${n}`,listen:'Послухати',
@@ -482,7 +491,7 @@ function paintScore(){
   sPts.textContent=score.pts;sOk.textContent=window.KC?KC.todayCount():score.ok;sStreak.textContent=score.streak;sBest.textContent=score.best;
   const L=lvlOf(score.pts),into=score.pts-L*PER;
   lvlName.textContent=`${t('level')} ${L+1} · ${lvlLabel(L)}`;
-  lvlPts.textContent=t('ptsOf',into,PER);lvlFill.style.width=(into/PER*100)+'%';
+  lvlPts.textContent=t('ptsOf',into,PER);if(window.KC)KC.paintGift(score.pts);lvlFill.style.width=(into/PER*100)+'%';
   combo.textContent='combo ×'+mult();combo.hidden=mult()<2;
 }
 paintScore();

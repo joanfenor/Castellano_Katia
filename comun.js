@@ -165,7 +165,13 @@ function mountSound(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mountSound);else mountSound();
 
-window.KC={get,set,L,lang,today,GOAL,days,todayCount,streak,hit,badges,checkBadges,stats,toast,
+
+function gift(pts){const PER=150,L=Math.floor(pts/PER),left=PER-(pts-L*PER);
+  const g=lang()==='uk'?{1:'соняшник у волоссі',3:'віночок',6:'блискучі зірочки'}:{1:'un girasol en el pelo',3:'una corona de flores',6:'estrellas brillantes'};
+  const x=g[L+1]||'';const n10=left%10,n100=left%100,w=n10===1&&n100!==11?'бала':'балів';return lang()==='uk'?`До наступного рівня бракує ${left} ${w}${x?': '+x:''}.`:`Te faltan ${left} puntos para el siguiente nivel${x?': '+x:''}.`}
+function paintGift(pts){const el=document.getElementById('nextGift');if(el)el.textContent=gift(pts)}
+
+window.KC={gift,paintGift,get,set,L,lang,today,GOAL,days,todayCount,streak,hit,badges,checkBadges,stats,toast,
   dailyStart,dailyActive,dailyBar,dailyTick,daily,canSpeak,say,canListen:!!SR,listen,report,backup,restore,extra,loadExtra,parseCSV};
 loadExtra();
 })();
