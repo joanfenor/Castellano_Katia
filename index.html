@@ -11,7 +11,30 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}
+.langrow span:empty{display:block}
+.today{margin:0 0 18px;display:grid;gap:14px}
+.todayhead{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.todayhead>div:first-child{flex:1 1 200px;min-width:0;display:grid;gap:6px}
+.todaynum{font-size:15px;color:var(--muted)}.todaynum b{font:400 34px var(--display);color:var(--ink)}
+.streak{display:grid;justify-items:center;background:var(--saffron-soft);border-radius:14px;padding:10px 16px;min-width:96px}
+.streak b{font:400 36px/1 var(--display);color:var(--ink)}.streak span{font-size:12.5px;color:var(--muted);text-align:center}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-width:250px}
+.cal b{font-size:11px;color:var(--muted);text-align:center;font-weight:600}
+.cal i{aspect-ratio:1;border-radius:6px;background:var(--line)}
+.cal i.some{background:#9fc1ee}.cal i.full{background:linear-gradient(135deg,#0057b7 50%,#ffd700 50%)}.cal i.fut{background:transparent;border:1px dashed var(--line)}
+.cal i.td{outline:2px solid var(--ink);outline-offset:1px}
+.dailybtn{justify-self:start;margin:0}
+.today .note{margin:0}
+.sech{font:400 26px var(--display);margin:26px 0 12px}.sech small{font:600 14px var(--body);color:var(--muted)}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.badge{display:grid;justify-items:center;align-content:start;gap:4px;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 6px;font-size:12px;line-height:1.3;color:var(--muted);min-width:0}
+.badge svg{width:32px;height:32px;color:var(--line)}
+.badge.on{color:var(--ink);font-weight:600;border-color:#e6c200}.badge.on svg{color:#e0a800}
+.backup{margin:22px 0 10px}.backup summary{font:400 22px var(--display);cursor:pointer}
+.backup .row{margin-top:10px}.filebtn{display:inline-flex;align-items:center;cursor:pointer}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cal i.some{background:#3d5f99}}
+</style>
 <title>El español de Katia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -275,7 +298,7 @@ footer{color:var(--muted);font-size:13px;padding-block:30px 40px}
 </div>
 <header>
   <div class="wrap">
-    <div class="langrow"><div class="lang" role="group" aria-label="Idioma / Мова">
+    <div class="langrow"><span></span><div class="lang" role="group" aria-label="Idioma / Мова">
       <button id="langEs" aria-pressed="true">Español</button><button id="langUk" aria-pressed="false" lang="uk">Українська</button>
     </div></div>
     <div class="hello">
@@ -294,44 +317,95 @@ footer{color:var(--muted);font-size:13px;padding-block:30px 40px}
       <p class="note" id="nextGift"></p>
     </div>
   </section>
+
+  <section class="today card">
+    <div class="todayhead">
+      <div>
+        <div class="appk" data-i18n="todayK">Hoy</div>
+        <div class="todaynum"><b id="tCount">0</b> / <span id="tGoal">20</span> <span data-i18n="hitsWord">aciertos</span></div>
+        <div class="bar"><i id="tFill"></i></div>
+      </div>
+      <div class="streak"><b id="sDays">0</b><span id="sDaysL">días seguidos</span></div>
+    </div>
+    <div class="cal" id="cal" aria-label="Últimas cuatro semanas"></div>
+    <button class="btn big dailybtn" id="dailyBtn" data-i18n="dailyBtn">Empezar el repaso de hoy</button>
+    <p class="note" data-i18n="dailyNote">20 preguntas mezcladas de verbos y vocabulario, eligiendo las que más te cuestan.</p>
+  </section>
+
   <nav class="apps">
     <a class="appcard" href="verbos.html">
       <span class="appk" data-i18n="kV">Conjugación</span>
       <span class="appt">Verbos</span>
-      <span class="appd" data-i18n="dV">44 verbos, los 15 tiempos y más de 200 frases con Joan, Tomas y Sonia.</span>
+      <span class="appd" data-i18n="dV"></span>
       <span class="appgo" data-i18n="go">Entrar →</span>
     </a>
     <a class="appcard" href="vocabulario.html">
       <span class="appk" data-i18n="kW">Palabras</span>
       <span class="appt">Vocabulario</span>
-      <span class="appd" data-i18n="dW">1.006 palabras en 14 temas, con traducción, ejemplos y 8 juegos.</span>
+      <span class="appd" data-i18n="dW"></span>
+      <span class="appgo" data-i18n="go">Entrar →</span>
+    </a>
+    <a class="appcard" href="gramatica.html">
+      <span class="appk" data-i18n="kG">Gramática práctica</span>
+      <span class="appt" data-i18n="tG">Dudas y situaciones</span>
+      <span class="appd" data-i18n="dG"></span>
       <span class="appgo" data-i18n="go">Entrar →</span>
     </a>
   </nav>
+
+  <section class="badgesec">
+    <h2 class="sech"><span data-i18n="badgesH">Logros</span> <small id="bCount"></small></h2>
+    <div class="badges" id="badges"></div>
+  </section>
+
+  <details class="card backup" id="backup">
+    <summary data-i18n="bkH">Copia de seguridad del progreso</summary>
+    <p class="note" data-i18n="bkNote">Guarda una copia de vez en cuando. Si cambias de móvil o se borran los datos, podrás recuperar tus puntos, niveles y logros.</p>
+    <div class="row">
+      <button class="btn" id="bkSave" data-i18n="bkSave">Guardar copia</button>
+      <button class="btn ghost" id="bkShare" data-i18n="bkShare">Enviar copia</button>
+      <label class="btn ghost filebtn"><span data-i18n="bkLoad">Recuperar desde archivo</span><input type="file" id="bkFile" accept=".json,application/json,text/plain" hidden></label>
+    </div>
+    <p class="note" id="bkMsg" aria-live="polite"></p>
+  </details>
 </main>
-<footer class="wrap" data-i18n="foot">Tu progreso se guarda en este móvil y funciona sin conexión.</footer>
+<footer class="wrap" data-i18n="foot">Tu progreso se guarda en este móvil y la app funciona sin conexión.</footer>
+<script src="config.js"></script>
+<script src="comun.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const ukN=(n,a,b,c)=>{const m10=n%10,m100=n%100;return m10===1&&m100!==11?a:(m10>=2&&m10<=4&&(m100<12||m100>14)?b:c)};
 const I18N={
- es:{title:'El español de Katia',eyebrow:'El español de Katia',hello:'¡Hola, <em>Katia</em>!',sub:'¿Qué te apetece practicar hoy?',stPts:'puntos',stLvl:'nivel',stBest:'mejor racha',
-  kV:'Conjugación',dV:'44 verbos, los 15 tiempos y más de 200 frases con Joan, Tomas y Sonia.',kW:'Palabras',dW:'1.006 palabras en 14 temas, con traducción, ejemplos y 8 juegos.',go:'Entrar →',
-  foot:'Tu progreso se guarda en este móvil y funciona sin conexión.',level:'Nivel',ptsOf:(a,b)=>`${a} / ${b} puntos`,
+ es:{title:'El español de Katia',eyebrow:'El español de Katia',hello:'¡Hola, <em>Katia</em>!',sub:'¿Qué te apetece practicar hoy?',
+  kV:'Conjugación',dV:'44 verbos, los 15 tiempos y más de 200 frases con Tomas y Sonia.',kW:'Palabras',dW:'Más de 1.000 palabras en 14 temas, con traducción, ejemplos y 10 juegos.',
+  kG:'Gramática práctica',tG:'Dudas y situaciones',dG:'Ser o estar, por o para, el pasado, artículos y gustar. Y conversaciones de cada día.',go:'Entrar →',
+  todayK:'Hoy',hitsWord:'aciertos',days:n=>n===1?'día seguido':'días seguidos',dailyBtn:'Empezar el repaso de hoy',
+  dailyNote:'20 preguntas mezcladas de verbos y vocabulario, empezando por las que más te cuestan.',dailyDone:'¡Repaso de hoy completado! 🌻',
+  badgesH:'Logros',bOf:(a,b)=>`${a} de ${b}`,
+  bkH:'Copia de seguridad del progreso',bkNote:'Guarda una copia de vez en cuando. Si cambias de móvil o se borran los datos, podrás recuperar tus puntos, niveles y logros.',
+  bkSave:'Guardar copia',bkShare:'Enviar copia',bkLoad:'Recuperar desde archivo',bkSaved:'Copia guardada en Descargas.',bkOk:'¡Copia recuperada! Ya tienes tu progreso.',bkBad:'Ese archivo no es una copia de esta app.',bkNoShare:'Este móvil no permite enviar archivos desde aquí. Usa «Guardar copia».',
+  foot:'Tu progreso se guarda en este móvil y la app funciona sin conexión.',level:'Nivel',ptsOf:(a,b)=>`${a} / ${b} puntos`,
   levels:['Principiante','Aprendiz','Exploradora','Viajera','Conversadora','Experta','Maestra','Leyenda del español'],
   gift:(n,g)=>`Te faltan ${n} puntos para el siguiente nivel${g?': '+g:''}.`,gifts:{1:'un girasol en el pelo',3:'una corona de flores',6:'estrellas brillantes'},skip:'Toca para empezar',
-  splash:['Cada día un poquito más. ¡Tú puedes!','Hoy vas a aprender algo nuevo. ¡Vamos allá!','Poco a poco, el español ya es tuyo. ¡Ánimo!','Equivocarse también es aprender. ¡A por ello!']},
- uk:{title:'Іспанська для Каті',eyebrow:'Іспанська для Каті',hello:'Привіт, <em>Катю</em>!',sub:'Що сьогодні потренуємо?',stPts:'бали',stLvl:'рівень',stBest:'найкраща серія',
-  kV:'Дієвідмінювання',dV:'44 дієслова, усі 15 часів і понад 200 речень про Жоана, Томаса і Соню.',kW:'Слова',dW:'1006 слів у 14 темах, з перекладом, прикладами і 8 іграми.',go:'Увійти →',
+  splash:['Cada día un poquito más. ¡Tú puedes!','Hoy vas a aprender algo nuevo. ¡Vamos allá!','Poco a poco, el español ya es tuyo. ¡Ánimo!','Equivocarse también es aprender. ¡A por ello!'],
+  wd:['L','M','X','J','V','S','D']},
+ uk:{title:'Іспанська для Каті',eyebrow:'Іспанська для Каті',hello:'Привіт, <em>Катю</em>!',sub:'Що сьогодні потренуємо?',
+  kV:'Дієвідмінювання',dV:'44 дієслова, усі 15 часів і понад 200 речень про Томаса і Соню.',kW:'Слова',dW:'Понад 1000 слів у 14 темах, з перекладом, прикладами і 10 іграми.',
+  kG:'Практична граматика',tG:'Труднощі та ситуації',dG:'Ser чи estar, por чи para, минулий час, артиклі та gustar. І щоденні розмови.',go:'Увійти →',
+  todayK:'Сьогодні',hitsWord:'правильних',days:n=>ukN(n,'день поспіль','дні поспіль','днів поспіль'),dailyBtn:'Почати повторення дня',
+  dailyNote:'20 змішаних запитань з дієслів і слів — спочатку ті, що даються найважче.',dailyDone:'Повторення дня виконано! 🌻',
+  badgesH:'Досягнення',bOf:(a,b)=>`${a} з ${b}`,
+  bkH:'Резервна копія прогресу',bkNote:'Час від часу зберігай копію. Якщо зміниш телефон або дані зітруться, ти зможеш відновити бали, рівні й досягнення.',
+  bkSave:'Зберегти копію',bkShare:'Надіслати копію',bkLoad:'Відновити з файлу',bkSaved:'Копію збережено в «Завантаженнях».',bkOk:'Копію відновлено! Твій прогрес на місці.',bkBad:'Цей файл не є копією цього застосунку.',bkNoShare:'Цей телефон не дозволяє надсилати файли звідси. Скористайся «Зберегти копію».',
   foot:'Твій прогрес зберігається на цьому телефоні, і все працює без інтернету.',level:'Рівень',ptsOf:(a,b)=>`${a} / ${b} балів`,
   levels:['Початківиця','Учениця','Дослідниця','Мандрівниця','Співрозмовниця','Експертка','Майстриня','Легенда іспанської'],
   gift:(n,g)=>`До наступного рівня бракує ${n} ${ukN(n,'бала','балів','балів')}${g?': '+g:''}.`,gifts:{1:'соняшник у волоссі',3:'віночок',6:'блискучі зірочки'},skip:'Торкнись, щоб почати',
-  splash:['Щодня трошки більше. У тебе все вийде!','Сьогодні ти вивчиш щось нове. Уперед!','Крок за кроком іспанська стає твоєю. Тримайся!','Помилятися — теж означає вчитися. Уперед!']}
+  splash:['Щодня трошки більше. У тебе все вийде!','Сьогодні ти вивчиш щось нове. Уперед!','Крок за кроком іспанська стає твоєю. Тримайся!','Помилятися — теж означає вчитися. Уперед!'],
+  wd:['Пн','Вт','Ср','Чт','Пт','Сб','Нд']}
 };
-const get=(k,d)=>{try{const x=localStorage.getItem('katia-'+k);return x===null?d:JSON.parse(x)}catch(e){return d}};
-const set=(k,v)=>{try{localStorage.setItem('katia-'+k,JSON.stringify(v))}catch(e){}};
-let lang=get('lang','es');if(!I18N[lang])lang='es';
+let lang=KC.get('lang','es');if(!I18N[lang])lang='es';
 const t=(k,...a)=>{const v=I18N[lang][k];return typeof v==='function'?v(...a):v};
-const PER=150,pts=get('pts',0),L=Math.floor(pts/PER);
+const PER=150,pts=KC.get('pts',0),L=Math.floor(pts/PER);
 function faceSVG(m,L){
   const hair='#ead08e',hairD='#b8944f',hairL='#f8ebc2',brow='#8b6a43',skin='#f8dccb',ol='#8a6248',line='#3b2a22';
   const happy=m>=1,sadBrow=m<=-1;
@@ -394,6 +468,18 @@ function faceSVG(m,L){
   return o+'</svg>';
 }
 
+const MEDAL='<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M13 2h6l-3 12h-6zM21 2h6l3 12h-6z" fill="currentColor" opacity=".55"/><circle cx="20" cy="25" r="12" fill="currentColor"/><path d="M20 18l2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.5 5-.7z" fill="#fff" opacity=".9"/></svg>';
+function drawToday(){
+  const n=KC.todayCount(),g=KC.GOAL,st=KC.streak();
+  $('tCount').textContent=n;$('tGoal').textContent=g;$('tFill').style.width=Math.min(100,n/g*100)+'%';
+  $('sDays').textContent=st;$('sDaysL').textContent=t('days',st);
+  const d=KC.days(),cells=[],now=new Date(),dow=(now.getDay()+6)%7;const start=new Date(now);start.setDate(now.getDate()-dow-21);
+  for(let i=0;i<28;i++){const c=new Date(start);c.setDate(start.getDate()+i);const k=`${c.getFullYear()}-${String(c.getMonth()+1).padStart(2,'0')}-${String(c.getDate()).padStart(2,'0')}`;
+    const v=d[k]||0,fut=c>now,lvl=fut?'fut':v>=g?'full':v>0?'some':'none';cells.push(`<i class="${lvl}${k===KC.today()?' td':''}" title="${k}: ${v}"></i>`)}
+  $('cal').innerHTML=t('wd').map(x=>`<b>${x}</b>`).join('')+cells.join('');
+}
+function drawBadges(){const bs=KC.badges(),on=bs.filter(b=>b.on).length;$('bCount').textContent=t('bOf',on,bs.length);
+  $('badges').innerHTML=bs.map(b=>`<div class="badge${b.on?' on':''}">${MEDAL}<span>${b.name}</span></div>`).join('')}
 function paint(){
   document.documentElement.lang=lang==='uk'?'uk':'es';document.title=t('title');
   document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
@@ -402,9 +488,22 @@ function paint(){
   const into=pts-L*PER,lv=t('levels');
   $('lvlName').textContent=`${t('level')} ${L+1} · ${lv[Math.min(L,lv.length-1)]}`;$('lvlPts').textContent=t('ptsOf',into,PER);$('lvlFill').style.width=(into/PER*100)+'%';
   $('nextGift').textContent=t('gift',PER-into,t('gifts')[L+1]||'');
+  drawToday();drawBadges();
 }
-$('langEs').onclick=()=>{lang='es';set('lang',lang);paint()};$('langUk').onclick=()=>{lang='uk';set('lang',lang);paint()};
-$('face').innerHTML=faceSVG(L>=1?2:1,L);paint();
+$('langEs').onclick=()=>{lang='es';KC.set('lang',lang);paint()};$('langUk').onclick=()=>{lang='uk';KC.set('lang',lang);paint()};
+$('dailyBtn').onclick=()=>KC.dailyStart();
+$('face').innerHTML=faceSVG(KC.todayCount()>=KC.GOAL?3:L>=1?2:1,L);
+KC.checkBadges();paint();
+if(/[?&]hecho=1/.test(location.search)){KC.toast(t('dailyDone'));try{history.replaceState(null,'','./')}catch(e){}}
+
+/* copia de seguridad */
+const bkName=()=>`castellano-katia-copia-${KC.today()}.json`;
+$('bkSave').onclick=()=>{const blob=new Blob([KC.backup()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=bkName();document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);$('bkMsg').textContent=t('bkSaved')};
+$('bkShare').onclick=async()=>{try{const f=new File([KC.backup()],bkName(),{type:'application/json'});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:bkName()});return}}catch(e){if(e&&e.name==='AbortError')return}
+  $('bkMsg').textContent=t('bkNoShare')};
+$('bkFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{KC.restore(await f.text());$('bkMsg').textContent=t('bkOk');setTimeout(()=>location.reload(),1200)}catch(err){$('bkMsg').textContent=t('bkBad')}e.target.value=''};
+
 (function(){
   const sp=$('splash');
   if(sessionStorage.getItem('katia-splash')){sp.hidden=true;return}

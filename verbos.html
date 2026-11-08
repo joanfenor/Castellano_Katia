@@ -241,6 +241,10 @@ aside.settings{display:grid;gap:16px}
 .moods .m h4{margin:0 0 6px;font-size:17px;color:var(--tile)}
 .moods .m p{margin:0 0 8px;font-size:15px;line-height:1.45}
 .moods .ex{color:var(--muted);font-size:14px}.moods .ex b{color:var(--ink)}
+.say{flex:none;border:1px solid var(--line);background:var(--bg);color:var(--tile);border-radius:8px;width:36px;height:32px;cursor:pointer;display:inline-grid;place-items:center;vertical-align:middle;margin-left:8px}
+.say svg{width:16px;height:16px}
+.t td.f[data-say]{cursor:pointer}
+.t td.f[data-say]:hover{background:var(--tile-soft)}
 footer{color:var(--muted);font-size:13px;padding-block:30px 40px}
 @media (prefers-reduced-motion:no-preference){.card.pop{animation:pop .25s ease}@keyframes pop{from{transform:scale(.985)}to{transform:none}}}
 
@@ -342,6 +346,8 @@ footer{color:var(--muted);font-size:13px;padding-block:30px 40px}
 <div id="burst" class="burst" hidden><div class="burst-inner"><div class="big" id="burstBig"></div><div class="q" id="burstSmall" style="font-size:22px"></div></div></div>
 <footer class="wrap" data-i18n-html="footer">Los puntos <span style="color:var(--saffron)">●</span> marcan formas irregulares. En azul, la terminación.</footer>
 
+<script src="config.js"></script>
+<script src="comun.js"></script>
 <script>
 document.getElementById('nojs').hidden=true;
 const find=document.getElementById('find'),groups=document.getElementById('groups'),verbView=document.getElementById('verbView'),tabC=document.getElementById('tabC'),tabP=document.getElementById('tabP'),viewC=document.getElementById('viewC'),viewP=document.getElementById('viewP'),sPts=document.getElementById('sPts'),sOk=document.getElementById('sOk'),sStreak=document.getElementById('sStreak'),sBest=document.getElementById('sBest'),exercise=document.getElementById('exercise'),verbPool=document.getElementById('verbPool'),tenseChecks=document.getElementById('tenseChecks'),allT=document.getElementById('allT'),basicT=document.getElementById('basicT'),lvlName=document.getElementById('lvlName'),lvlPts=document.getElementById('lvlPts'),lvlFill=document.getElementById('lvlFill'),combo=document.getElementById('combo'),sndBtn=document.getElementById('sndBtn'),resetPts=document.getElementById('resetPts'),burst=document.getElementById('burst'),burstBig=document.getElementById('burstBig'),burstSmall=document.getElementById('burstSmall'),selInfo=document.getElementById('selInfo'),selChange=document.getElementById('selChange'),settings=document.getElementById('settings'),langEs=document.getElementById('langEs'),langUk=document.getElementById('langUk');
@@ -355,7 +361,7 @@ const I18N={
   mWrite:'Escribe la forma',mChoice:'Elige la correcta',mSent:'Frases',mTimer:'Contrarreloj 60 s',change:'Cambiar',
   sel:(n,tot,pool,p)=>`Tiempos elegidos: <b>${n} de ${tot}</b> · ${pool} · <b>${p} puntos</b> por acierto`,
   hVerbs:'Verbos',hTenses:'Tiempos',allT:'Todos',basicT:'Solo los básicos',hGame:'Juego',
-  pAll:'Todos los verbos',pR:'Solo regulares',pC:'Solo cambio vocálico',pI:'Solo irregulares',pOne:'Un verbo',
+  pAll:'Todos los verbos',pHard:n=>`Mis formas difíciles (${n})`,legSay:'Toca una forma para escucharla',listen:'Escuchar',pR:'Solo regulares',pC:'Solo cambio vocálico',pI:'Solo irregulares',pOne:'Un verbo',
   sndOn:'Sonido activado',sndOff:'Sonido desactivado',reset:'Empezar de cero',resetSure:'¿Seguro? Pulsa otra vez para borrar',resetDone:'Puntos borrados',
   note1:'Cuantos más tiempos elijas, más puntos vale cada acierto: de 10 (un tiempo) a 38 (todos). Cada 3 aciertos seguidos el multiplicador sube (hasta ×5). Cada 150 puntos, nuevo nivel.',
   note2:'Las frases también siguen los tiempos y verbos que elijas. Si escribes la forma bien pero sin tilde, te lo marco como «casi».',
@@ -377,7 +383,7 @@ const I18N={
   mWrite:'Напиши форму',mChoice:'Обери правильну',mSent:'Речення',mTimer:'На час: 60 с',change:'Змінити',
   sel:(n,tot,pool,p)=>`Вибрано часів: <b>${n} з ${tot}</b> · ${pool} · <b>${p} ${ukN(p,'бал','бали','балів')}</b> за відповідь`,
   hVerbs:'Дієслова',hTenses:'Часи',allT:'Усі',basicT:'Лише основні',hGame:'Гра',
-  pAll:'Усі дієслова',pR:'Лише regulares',pC:'Лише cambio vocálico',pI:'Лише irregulares',pOne:'Одне дієслово',
+  pAll:'Усі дієслова',pHard:n=>`Мої складні форми (${n})`,legSay:'Торкнись форми, щоб її почути',listen:'Послухати',pR:'Лише regulares',pC:'Лише cambio vocálico',pI:'Лише irregulares',pOne:'Одне дієслово',
   sndOn:'Звук увімкнено',sndOff:'Звук вимкнено',reset:'Почати з нуля',resetSure:'Точно? Натисни ще раз, щоб стерти',resetDone:'Бали стерто',
   note1:'Що більше часів ти вибереш, то більше балів за кожну правильну відповідь: від 10 (один час) до 38 (усі). Кожні 3 правильні відповіді поспіль збільшують множник (до ×5). Кожні 150 балів — новий рівень.',
   note2:'Речення теж відповідають вибраним часам і дієсловам. Якщо форма правильна, але без знака наголосу (tilde), я позначу її як «майже».',
@@ -514,11 +520,16 @@ function fmt(inf,tid,i,form){
 
 /* ---------- store ---------- */
 const store={get(k,d){try{const x=localStorage.getItem('katia-'+k);return x===null?d:JSON.parse(x)}catch(e){return d}},set(k,v){try{localStorage.setItem('katia-'+k,JSON.stringify(v))}catch(e){}}};
+let VST=store.get('vst',{});
+const vbox=k=>(VST[k]||[0,0])[0],vwr=k=>(VST[k]||[0,0])[1];
+function vmark(k,ok){const s=VST[k]||[0,0];if(ok)s[0]=Math.min(5,s[0]+1);else{s[0]=0;s[1]++}VST[k]=s;store.set('vst',VST);if(typeof drawPool==='function')drawPool()}
+const hardKeys=()=>Object.keys(VST).filter(k=>vwr(k)>0&&vbox(k)<3&&!k.startsWith('ger')&&ALL[k.split('|')[0]]);
+const VW=[6,4,3,1.6,.8,.4];
 let score={ok:0,streak:0,best:store.get('best',0),pts:store.get('pts',0)};
 const lvlLabel=L=>{const a=t('levels');return a[Math.min(L,a.length-1)]};
 const PER=150, lvlOf=p=>Math.floor(p/PER), mult=()=>Math.min(1+Math.floor(score.streak/3),5), basePts=()=>10+2*(selT.length-1);
 function paintScore(){
-  sPts.textContent=score.pts;sOk.textContent=score.ok;sStreak.textContent=score.streak;sBest.textContent=score.best;
+  sPts.textContent=score.pts;sOk.textContent=window.KC?KC.todayCount():score.ok;sStreak.textContent=score.streak;sBest.textContent=score.best;
   const L=lvlOf(score.pts),into=score.pts-L*PER;
   lvlName.textContent=`${t('level')} ${L+1} · ${lvlLabel(L)}`;
   lvlPts.textContent=t('ptsOf',into,PER);lvlFill.style.width=(into/PER*100)+'%';
@@ -631,7 +642,7 @@ function levelUp(){const L=lvlOf(score.pts);SND.lvl();mood=3;paintFace('hop');co
   burst.hidden=false;clearTimeout(burstT);burstT=setTimeout(()=>burst.hidden=true,2600)}
 burst.onclick=()=>burst.hidden=true;
 function award(ok,almost){
-  if(ok){score.ok++;score.streak++;const m=mult(),g=basePts()*m,before=lvlOf(score.pts);score.pts+=g;store.set('pts',score.pts);
+  if(ok){score.ok++;score.streak++;if(window.KC)KC.hit();const m=mult(),g=basePts()*m,before=lvlOf(score.pts);score.pts+=g;store.set('pts',score.pts);
     if(score.streak>score.best){score.best=score.streak;store.set('best',score.best)}
     floatPts('+'+g+(m>1?'  ×'+m:''));fxCard('good');SND.ok();
     const r=exercise.getBoundingClientRect();confetti(score.streak%5===0?140:28,r.left+r.width/2,r.top+50);
@@ -652,17 +663,19 @@ function drawGroups(){
     return `<div class="group"><h3>${label}</h3><div class="chips">${vs.map(v=>`<button class="chip" data-v="${v.inf}" aria-pressed="${v.inf===current}">${v.inf}</button>`).join('')}</div></div>`;
   }).join('')||`<p class="note">${t('noVerb')}</p>`;
 }
+const SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>';
+const sayB=txt=>KC.canSpeak?`<button class="say" data-say="${txt}" aria-label="${t('listen')}">${SPK}</button>`:'';
 function drawVerb(){
   const {v,f,r}=ALL[current];
   const moods=['Indicativo','Subjuntivo','Imperativo'];
-  let h=`<div class="verbhead"><h2>${v.inf}</h2><span class="gloss">${v.en}</span>
+  let h=`<div class="verbhead"><h2>${v.inf}${sayB(v.inf)}</h2><span class="gloss">${v.en}</span>
    <div class="forms"><div><span>Gerundio</span> <b>${f.ger}</b></div><div><span>Participio</span> <b>${f.part}</b></div></div></div>
-   <div class="legend"><span>${t('legEnd')}</span><span>${t('legIrr')}</span></div>`;
+   <div class="legend"><span>${t('legEnd')}</span><span>${t('legIrr')}</span>${KC.canSpeak?`<span>${t('legSay')}</span>`:''}</div>`;
   for(const m of moods){
     const ts=TENSES.filter(t=>t.mood===m);
     const simple=ts.filter(t=>!t.comp), comp=ts.filter(t=>t.comp);
     const block=list=>`<div class="tables">${list.map(t=>`<div class="t"><h4>${t.name}</h4><p class="use">${t.use}</p><table>${
-      f[t.id].map((x,i)=>`<tr><td class="p">${PERS[i]}</td><td class="f${!t.comp&&x!=='—'&&x!==r[t.id][i]?' irr':''}">${fmt(v.inf,t.id,i,x)}</td></tr>`).join('')}</table></div>`).join('')}</div>`;
+      f[t.id].map((x,i)=>`<tr><td class="p">${PERS[i]}</td><td class="f${!t.comp&&x!=='—'&&x!==r[t.id][i]?' irr':''}"${x!=='—'&&KC.canSpeak?` data-say="${x}"`:''}>${fmt(v.inf,t.id,i,x)}</td></tr>`).join('')}</table></div>`).join('')}</div>`;
     h+=`<div class="mood"><h3>${m}</h3>${block(simple)}${comp.length?`<div class="compound" style="margin-top:12px">${block(comp)}</div>`:''}</div>`;
   }
   verbView.innerHTML=h;
@@ -677,7 +690,7 @@ tabC.onclick=()=>{stopTimer();setTab(false)};tabP.onclick=()=>{setTab(true);if(m
 
 /* ---------- Practicar ---------- */
 function drawPool(){const cur=verbPool.value||store.get('pool','all');
-verbPool.innerHTML=`<option value="all">${t('pAll')}</option><option value="r">${t('pR')}</option><option value="c">${t('pC')}</option><option value="i">${t('pI')}</option><optgroup label="${t('pOne')}">${VERBS.map(v=>`<option value="v:${v.inf}">${v.inf}</option>`).join('')}</optgroup>`;
+verbPool.innerHTML=`<option value="all">${t('pAll')}</option><option value="r">${t('pR')}</option><option value="c">${t('pC')}</option><option value="i">${t('pI')}</option><option value="hard">${t('pHard',hardKeys().length)}</option><optgroup label="${t('pOne')}">${VERBS.map(v=>`<option value="v:${v.inf}">${v.inf}</option>`).join('')}</optgroup>`;
 verbPool.value=cur;if(!verbPool.value)verbPool.value='all';}
 drawPool();
 function poolName(){const o=verbPool.selectedOptions&&verbPool.selectedOptions[0];return o?o.textContent:''}
@@ -803,6 +816,14 @@ const SENT=[
  ['Joan está ___ la cena.','hacer','ger',0],
  ['Katia está ___ música ucraniana.','oír','ger',0],
  ['Tomas ___ a baloncesto con sus amigos en el parque.','jugar','pres',2],
+ ['Katia ___ a su hijo Tomas jugar a baloncesto cada sábado.','ver','pres',2],
+ ['Katia está orgullosa de que su hijo Tomas ___ tanto.','aprender','sp',2],
+ ['Su hijo Tomas ___ del entrenamiento a las siete.','volver','pres',2],
+ ['Katia quiere que su hijo Tomas ___ más verdura.','comer','sp',2],
+ ['Ayer Katia ___ con su hijo Tomas al polideportivo.','ir','pret',2],
+ ['Tomas, ___ (tú) la mesa, que mamá ya viene.','poner','imp',1],
+ ['Katia y su hijo Tomas ___ en Barcelona.','vivir','pres',5],
+ ['Cuando Tomas era pequeño, Katia le ___ cuentos en ucraniano.','leer','impf',2],
  ['Joan ___ en una empresa de tecnología.','trabajar','pres',2],
  ['Tomas ___ diez horas cada noche.','dormir','pres',2],
  ['Joan y Katia ___ en Barcelona.','vivir','pres',5],
@@ -903,6 +924,12 @@ const SENT=[
  ['Katia ___ a estudiar español hace un año.','empezar','pret',2],
  ['Es importante que Katia ___ bien su decisión.','pensar','sp',2]
 ];
+(function(){if(!window.KC)return;
+  const nn=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();
+  for(const r of KC.extra()){if(!nn(r.tipo).startsWith('frase'))continue;
+    const v=nn(r.verbo),tm=nn(r.tiempo)==='gerundio'?'ger':nn(r.tiempo),pe=Math.max(1,Math.min(6,parseInt(r.persona||'1',10)||1))-1;
+    if(!r.frase||!r.frase.includes('___')||!ALL[v]||(tm!=='ger'&&!TBY[tm]))continue;
+    if(SENT.some(x=>x[0]===r.frase))continue;SENT.push([r.frase,v,tm,tm==='ger'?0:pe])}})();
 
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -912,12 +939,17 @@ function lev(a,b){const m=a.length,n=b.length;let d=Array.from({length:n+1},(_,j
   for(let i=1;i<=m;i++){let prev=d[0];d[0]=i;for(let j=1;j<=n;j++){const tmp=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,prev+(a[i-1]===b[j-1]?0:1));prev=tmp}}return d[n]}
 let Q=null,lastKey='',recent=[],sentBag=[],sentSig='';
 
-function pool(){const p=verbPool.value;if(p==='all')return VERBS;if(p.startsWith('v:'))return VERBS.filter(v=>v.inf===p.slice(2));return VERBS.filter(v=>v.g===p);}
+function pool(){const p=verbPool.value;if(p==='all'||p==='hard')return VERBS;if(p.startsWith('v:'))return VERBS.filter(v=>v.inf===p.slice(2));return VERBS.filter(v=>v.g===p);}
+function cand(){const v=rnd(pool()),t=rnd(selT),i=t.startsWith('imp')?1+Math.floor(Math.random()*5):Math.floor(Math.random()*6);return {v,t,i}}
 function pick(){
-  let q,k,guard=0;
-  do{const v=rnd(pool()),t=rnd(selT),i=t.startsWith('imp')?1+Math.floor(Math.random()*5):Math.floor(Math.random()*6);
-    q={v,t,i,ans:ALL[v.inf].f[t][i]};k=v.inf+t+i;}while(recent.includes(k)&&guard++<40);
-  recent.push(k);if(recent.length>40)recent.shift();lastKey=k;return q;
+  let c;
+  let hk=verbPool.value==='hard'?hardKeys():[];if(hk.length>1){const fresh=hk.filter(k=>!recent.includes(k));hk=fresh.length?fresh:hk.filter(k=>k!==lastKey)}
+  if(hk.length){const [inf,t,i]=rnd(hk).split('|');c={v:ALL[inf].v,t,i:+i}}
+  else{let best=null,bw=-1;
+    for(let n=0;n<8;n++){const x=cand(),k=`${x.v.inf}|${x.t}|${x.i}`;const w=(recent.includes(k)?.02:1)*(VW[vbox(k)]+Math.min(vwr(k),4))*Math.random();if(w>bw){bw=w;best=x}}
+    c=best}
+  const k=`${c.v.inf}|${c.t}|${c.i}`;recent.push(k);if(recent.length>40)recent.shift();lastKey=k;
+  return {...c,ans:ALL[c.v.inf].f[c.t][c.i]};
 }
 function distractors(q){
   const F=ALL[q.v.inf].f,Rg=ALL[q.v.inf].r,set=new Set([q.ans]),out=[];
@@ -945,8 +977,10 @@ let qToken=0;
 const T={running:false,end:0,score:0,correct:0,int:0,best:store.get('tbest',0)};
 function freshCard(){exercise.className='card';void exercise.offsetWidth;exercise.classList.add('pop')}
 let screen='';
+let DAILY=false;
 function newQ(){
   qToken++;
+  if(DAILY)mode=Math.random()<.5?'choice':'write';
   if(mode==='timer'&&!T.running){timerIntro();return}
   freshCard();
   if(mode==='sentence'){
@@ -998,10 +1032,12 @@ function bindInput(){
 }
 function result(kind){
   Q.done=true;Q.kind=kind;const tok=qToken;
+  vmark(Q.st?`${Q.st[1]}|${Q.st[2]}|${Q.st[3]}`:`${Q.v.inf}|${Q.t}|${Q.i}`,kind==='ok');
   award(kind==='ok',kind==='almost');
   Q.streakAt=score.streak;Q.praise=Math.floor(Math.random()*7);
   paintResult(true);
   if(Q.mode==='timer'){setTimeout(()=>{if(tok===qToken&&T.running)newQ()},kind==='ok'?500:1700);return}
+  if(DAILY&&KC.dailyTick('verbos'))return;
   if(kind==='ok')setTimeout(()=>{if(tok===qToken&&!viewP.hidden)newQ()},1500);
 }
 
@@ -1060,6 +1096,7 @@ function paintResult(first){
   fb.className='feedback '+(kind==='ok'?'ok':kind==='almost'?'almost':'no');
   fb.innerHTML=kind==='ok'?`${Q.streakAt>0&&Q.streakAt%5===0?t('streakMsg',Q.streakAt):pr[Q.praise%pr.length]} <b>${Q.ans}</b>`
     :kind==='almost'?t('almost',Q.ans):t('wrong',Q.ans);
+  fb.insertAdjacentHTML('beforeend',sayB(Q.st?Q.st[0].replace('___',Q.ans).replace(/\((?:yo|tú|nosotros|vosotros)\) ?/g,''):Q.ans));
   addExplain();
   if(Q.opts&&kind!=='ok'){const n=document.createElement('div');n.className='next';n.innerHTML=`<button class="btn" id="nx">${t('next')}</button>`;exercise.appendChild(n);const nx=document.getElementById('nx');nx.onclick=newQ;if(first)nx.focus()}
 }
@@ -1160,7 +1197,8 @@ paintFace();
   sp.addEventListener('click',close);document.addEventListener('keydown',close,{once:true});
   setTimeout(close,3000);
 })();
-if(store.get('tab',false)) setTab(true);
+if(window.KC&&KC.dailyActive('verbos')){DAILY=true;KC.dailyBar('verbos');setTab(true);newQ()}
+else if(store.get('tab',false)) setTab(true);
 </script>
 
 <script>
