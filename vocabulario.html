@@ -331,6 +331,11 @@ header .wrap.hdr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;
 .htop .face svg{transform:scale(1.22) translateY(7%);transform-origin:50% 40%}
 @media (max-width:420px){.htop .face{width:78px;height:78px}}
 .htitle .eyebrow{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* cabecera fija */
+header{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--kcd,0px));z-index:20;box-shadow:0 4px 14px rgba(0,30,80,.18)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:21;background:#0057b7}
+main [id]{scroll-margin-top:calc(var(--hdrh,200px) + 12px)}
 </style>
 </head>
 <body>

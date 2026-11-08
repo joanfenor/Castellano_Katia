@@ -94,6 +94,7 @@ function dailyBar(phase){
   let bar=document.querySelector('.kc-daily');
   if(!bar){bar=document.createElement('div');bar.className='kc-daily';document.body.prepend(bar)}
   const total=DN*2,doneN=(phase==='verbos'?0:DN)+(DN-d.left);
+  document.documentElement.style.setProperty('--kcd',bar.offsetHeight+'px');
   bar.innerHTML=`<span>${L('Repaso de hoy','Повторення дня')} · ${doneN}/${total}</span><span class="kb"><i style="width:${doneN/total*100}%"></i></span><a href="./">${L('Salir','Вийти')}</a>`;
 }
 function dailyTick(phase){
@@ -164,6 +165,8 @@ function mountSound(){
   paint();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mountSound);else mountSound();
+function hdrH(){const h=document.querySelector('header');if(h)document.documentElement.style.setProperty('--hdrh',h.offsetHeight+'px');const b=document.querySelector('.kc-daily');if(b)document.documentElement.style.setProperty('--kcd',b.offsetHeight+'px')}
+addEventListener('load',hdrH);addEventListener('resize',hdrH);
 
 
 function gift(pts){const PER=150,L=Math.floor(pts/PER),left=PER-(pts-L*PER);
