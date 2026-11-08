@@ -315,24 +315,48 @@ footer{color:var(--muted);font-size:13px;padding-block:30px 40px}
 .langrow{justify-content:space-between;align-items:center;gap:10px}
 .homebtn{font:700 14px var(--body);text-decoration:none;color:var(--ink);background:var(--card);padding:8px 14px;border-radius:999px;box-shadow:0 4px 16px rgba(0,30,80,.18)}
 .homebtn:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+
+/* ---- cabecera compacta ---- */
+header .wrap.hdr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:stretch;padding-block:12px 14px}
+.hdr .hello{padding:10px 14px;display:grid;align-content:center;gap:2px;min-width:0}
+.hdr .eyebrow{font-size:11px;letter-spacing:.12em}
+.hdr h1{font-size:clamp(24px,6.6vw,34px);margin:0;line-height:1.1}
+.hdr .stats{background:none;box-shadow:none;padding:0;display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:6px}
+.hdr .stat{background:none;border:0;padding:0;min-width:0;display:flex;align-items:baseline;gap:4px;flex:none}
+.hdr .stat b{font-size:17px;display:inline}
+.hdr .stat span{font-size:11.5px}
+.hdrside{display:flex;flex-direction:column;gap:8px;justify-content:center}
+.hdrside .lang{display:flex;flex-direction:column;border-radius:16px;gap:2px;padding:4px}
+.hdrside .lang button{border-radius:12px;padding:7px 10px;font-size:13px}
+.hdrbtns{display:flex;gap:8px;justify-content:center}
+.hdrbtns .homebtn{width:44px;height:44px;border-radius:50%;padding:0;display:grid;place-items:center;color:var(--tile)}
+.hellohome{grid-template-columns:auto minmax(0,1fr)!important;column-gap:12px!important;align-items:center}
+.hellohome .face{width:72px;height:72px;grid-row:1}
+.hellohome .htext{min-width:0;display:grid;gap:2px}
+.hellohome .lvl{font-size:12.5px;margin:6px 0 4px;gap:6px}
+.hellohome .bar{height:8px}
+.hellohome .note{font-size:11.5px;margin:4px 0 0;line-height:1.3}
+@media (max-width:420px){.hellohome .face{width:58px;height:58px}.hdr .hello{padding:10px 12px}}
 </style>
 </head>
 <body>
 <header>
-  <div class="wrap">
-    <div class="langrow"><a class="homebtn" href="./" data-i18n="home">‹ Inicio</a><div class="lang" role="group" aria-label="Idioma / Мова">
-      <button id="langEs" aria-pressed="true">Español</button><button id="langUk" aria-pressed="false" lang="uk">Українська</button>
-    </div></div>
+  <div class="wrap hdr">
     <div class="hello">
       <div class="eyebrow" data-i18n="eyebrow">Dudas y situaciones</div>
       <h1 data-i18n-html="hello">¡Hola, <em>Katia</em>!</h1>
-      <p class="sub" data-i18n="sub">Las dudas típicas del español y conversaciones de cada día.</p>
-    </div>
-    <div class="stats" aria-live="polite">
+      <div class="stats" aria-live="polite">
       <div class="stat"><b id="sPts">0</b><span data-i18n="stPts">puntos</span></div>
       <div class="stat"><b id="sOk">0</b><span data-i18n="stOk">aciertos hoy</span></div>
       <div class="stat"><b id="sStreak">0</b><span data-i18n="stStreak">racha</span></div>
       <div class="stat"><b id="sBest">0</b><span data-i18n="stBest">mejor racha</span></div>
+    </div>
+    </div>
+    <div class="hdrside">
+      <div class="lang" role="group" aria-label="Idioma / Мова">
+      <button id="langEs" aria-pressed="true">Español</button><button id="langUk" aria-pressed="false" lang="uk">Українська</button>
+    </div>
+      <div class="hdrbtns"><a class="homebtn" href="./" aria-label="Inicio" title="Inicio"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg></a></div>
     </div>
   </div>
 </header>
