@@ -31,6 +31,7 @@
 .badge{display:grid;justify-items:center;align-content:start;gap:4px;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 6px;font-size:12px;line-height:1.3;color:var(--muted);min-width:0}
 .badge svg{width:32px;height:32px;color:var(--line)}
 .badge.on{color:var(--ink);font-weight:600;border-color:#e6c200}.badge.on svg{color:#e0a800}
+.badge.sec.on{background:linear-gradient(160deg,#fff7d6,#ffe1f0);border-color:#d83a9a}.badge.sec.on svg{color:#d83a9a}
 .backup{margin:22px 0 10px}.backup summary{font:400 22px var(--display);cursor:pointer}
 .backup .row{margin-top:10px}.filebtn{display:inline-flex;align-items:center;cursor:pointer}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cal i.some{background:#3d5f99}}
@@ -428,9 +429,74 @@ body{padding-top:calc(var(--hdrh,130px) + var(--kcd,0px))}
 .homebadge{position:absolute;top:-8px;right:-8px;width:32px;height:32px;border-radius:50%;background:var(--card);color:var(--tile);display:grid;place-items:center;box-shadow:0 3px 10px rgba(0,30,80,.3);z-index:2;border:2px solid var(--line);padding:0;cursor:pointer}
 .exitbadge{color:var(--bad)}
 .homebadge~.hcol .eyebrow{padding-right:22px}
+
+/* ---------- cumpleaños (19 de febrero) ---------- */
+.bday{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:16px;overflow:hidden;
+  background:radial-gradient(circle at 50% 35%,#ffe6f3 0,#ffb6d9 38%,#b04aa0 75%,#5b2a8f 100%)}
+.bday::before{content:"";position:absolute;inset:-50%;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.12) 0 10deg,transparent 10deg 20deg);animation:bspin 40s linear infinite}
+@keyframes bspin{to{transform:rotate(360deg)}}
+.bday.out{opacity:0;visibility:hidden;transition:opacity .6s,visibility .6s}
+.bday canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.bcard{position:relative;background:#fffaf3;border:5px solid #fff;border-radius:28px;max-width:400px;width:100%;padding:18px 18px 20px;text-align:center;
+  box-shadow:0 30px 70px rgba(60,10,80,.45);animation:bIn .8s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes bIn{from{transform:scale(.5) rotate(-6deg);opacity:0}}
+.bcard h2{font:400 clamp(30px,9vw,40px)/1.08 var(--display);margin:4px 0 6px;color:#5a2b8c;text-wrap:balance}
+.bcard h2 em{font-style:normal;color:#d83a9a}
+.bcard p{margin:0 0 12px;color:#7a5a8f;font-size:16px;line-height:1.4;text-wrap:balance}
+.bcard .cake{width:min(260px,70vw);height:auto;display:block;margin:0 auto 6px;overflow:visible}
+.cake .cd{cursor:pointer}
+.cake .fl{transform-box:fill-box;transform-origin:50% 100%;animation:flick .18s ease-in-out infinite alternate}
+.cake .fl.b{animation-duration:.23s}
+@keyframes flick{from{transform:scaleY(1) skewX(-3deg)}to{transform:scaleY(1.12) skewX(4deg)}}
+.cake .cd.off .fl,.cake .cd.off .glow{opacity:0;transition:opacity .25s}
+.cake .smoke{opacity:0}.cake .cd.off .smoke{animation:smoke 1.6s ease-out forwards}
+@keyframes smoke{0%{opacity:.8;transform:translateY(0) scale(.6)}100%{opacity:0;transform:translateY(-34px) scale(1.6)}}
+.cake .smoke{transform-box:fill-box;transform-origin:50% 100%}
+.bbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.bbtn{font:800 16px var(--body);border:0;border-radius:14px;padding:12px 18px;color:#fff;cursor:pointer;background:linear-gradient(180deg,#ff7ac6,#d83a9a);box-shadow:0 5px 0 #9e1f6c}
+.bbtn:active{transform:translateY(3px);box-shadow:0 2px 0 #9e1f6c}
+.bbtn.ghost{background:#fff;color:#5a2b8c;box-shadow:0 4px 0 #e2cdf2}
+.bnote{font-size:13px!important;margin:8px 0 0!important}
+.bmeter{height:8px;border-radius:9px;background:#f3e3f7;overflow:hidden;margin:0 auto 10px;max-width:220px}.bmeter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#9fd6ff,#d83a9a)}
+.bgift{font:400 30px var(--display);color:#e2a400;text-shadow:0 2px 0 #fff3c4;margin:2px 0 8px}
+@media (prefers-reduced-motion:reduce){.bday::before,.bcard,.cake .fl{animation:none}}
 </style>
 </head>
 <body>
+<div class="bday" id="bday" hidden role="dialog" aria-label="Feliz cumpleaños">
+  <canvas id="bconf"></canvas>
+  <div class="bcard">
+    <svg class="cake" id="cake" viewBox="0 0 260 230" aria-hidden="true">
+      <defs>
+        <linearGradient id="ck1" x1="0" x2="1"><stop offset="0" stop-color="#e88fb8"/><stop offset=".35" stop-color="#ffc2dc"/><stop offset=".7" stop-color="#f7a6c9"/><stop offset="1" stop-color="#d4709f"/></linearGradient>
+        <linearGradient id="ck2" x1="0" x2="1"><stop offset="0" stop-color="#7a4a2a"/><stop offset=".35" stop-color="#a8683c"/><stop offset=".7" stop-color="#8f5530"/><stop offset="1" stop-color="#5e3418"/></linearGradient>
+        <linearGradient id="icing" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fbe3ef"/></linearGradient>
+        <linearGradient id="plate" x1="0" x2="1"><stop offset="0" stop-color="#cfd8e6"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#b7c3d6"/></linearGradient>
+        <linearGradient id="cdl" x1="0" x2="1"><stop offset="0" stop-color="#5a9be0"/><stop offset=".5" stop-color="#bfe0ff"/><stop offset="1" stop-color="#2f6fb8"/></linearGradient>
+        <linearGradient id="cdl2" x1="0" x2="1"><stop offset="0" stop-color="#e0b400"/><stop offset=".5" stop-color="#fff2a8"/><stop offset="1" stop-color="#c49400"/></linearGradient>
+        <radialGradient id="flame" cx=".5" cy=".7" r=".6"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#fff3a0"/><stop offset=".7" stop-color="#ffb02e"/><stop offset="1" stop-color="#ff5a1f"/></radialGradient>
+        <radialGradient id="glow"><stop offset="0" stop-color="rgba(255,220,120,.7)"/><stop offset="1" stop-color="rgba(255,220,120,0)"/></radialGradient>
+        <pattern id="stripes" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="14" height="14" fill="none"/><rect width="5" height="14" fill="rgba(255,255,255,.55)"/></pattern>
+      </defs>
+      <ellipse cx="130" cy="212" rx="118" ry="14" fill="url(#plate)"/><ellipse cx="130" cy="208" rx="108" ry="10" fill="#eef2f8"/>
+      <rect x="32" y="140" width="196" height="68" rx="10" fill="url(#ck2)"/>
+      <rect x="32" y="166" width="196" height="10" fill="#ffd23f" opacity=".9"/>
+      <g fill="#ff7ac6"><circle cx="50" cy="190" r="4"/><circle cx="80" cy="196" r="4"/><circle cx="110" cy="190" r="4"/><circle cx="140" cy="196" r="4"/><circle cx="170" cy="190" r="4"/><circle cx="200" cy="196" r="4"/></g>
+      <path d="M30 146q0-10 10-10h180q10 0 10 10v6q-8 0-10 10q-3 9-7 0q-3-9-12-6q-7 2-8 12q-2 8-6 0q-3-12-14-10q-8 2-10 12q-2 7-6 0q-4-12-14-8q-8 3-9 10q-2 6-5 0q-4-10-14-10q-9 1-10 10q-2 6-6 0q-3-9-13-9q-9 1-10 10q-2 6-5 0q-3-10-12-10q-6 0-8 6z" fill="url(#icing)"/>
+      <rect x="54" y="78" width="152" height="66" rx="10" fill="url(#ck1)"/>
+      <rect x="54" y="78" width="152" height="66" rx="10" fill="url(#stripes)" opacity=".5"/>
+      <path d="M52 86q0-10 10-10h136q10 0 10 10v4q-7 0-9 9q-3 8-6 0q-3-8-11-6q-6 2-7 10q-2 7-5 0q-3-10-12-8q-7 1-8 10q-2 6-5 0q-4-10-12-8q-7 2-8 9q-2 5-5 0q-3-9-12-9q-8 1-9 9q-2 5-5 0q-3-8-11-8q-8 1-9 8q-2 5-5 0q-3-8-10-8z" fill="url(#icing)"/>
+      <g><circle cx="80" cy="76" r="5" fill="#e0303a"/><circle cx="130" cy="74" r="5" fill="#e0303a"/><circle cx="180" cy="76" r="5" fill="#e0303a"/><circle cx="78" cy="74" r="1.6" fill="#fff" opacity=".8"/><circle cx="128" cy="72" r="1.6" fill="#fff" opacity=".8"/><circle cx="178" cy="74" r="1.6" fill="#fff" opacity=".8"/></g>
+      <g id="candles"></g>
+    </svg>
+    <h2 id="bH"></h2>
+    <p id="bP"></p>
+    <div class="bmeter" id="bMeter" hidden><i id="bLvl"></i></div>
+    <div class="bgift" id="bGift" hidden>+100 ★</div>
+    <div class="bbtns"><button class="bbtn" id="bMic"></button><button class="bbtn ghost" id="bGo" hidden></button></div>
+    <p class="bnote" id="bNote"></p>
+  </div>
+</div>
 <div class="splash" id="splash" role="dialog" aria-label="Bienvenida">
   <div class="sp-sheen" aria-hidden="true"></div><div class="sp-parts" id="spParts" aria-hidden="true"></div>
   <div class="splash-card">
@@ -625,7 +691,7 @@ function drawToday(){
   $('cal').innerHTML=t('wd').map(x=>`<b>${x}</b>`).join('')+cells.join('');
 }
 function drawBadges(){const bs=KC.badges(),on=bs.filter(b=>b.on).length;$('bCount').textContent=t('bOf',on,bs.length);
-  $('badges').innerHTML=bs.map(b=>`<div class="badge${b.on?' on':''}">${MEDAL}<span>${b.name}</span></div>`).join('')}
+  $('badges').innerHTML=bs.map(b=>`<div class="badge${b.on?' on':''}${b.secret?' sec':''}">${MEDAL}<span>${b.secret&&!b.on?'???':b.name}</span></div>`).join('')}
 function paint(){
   document.documentElement.lang=lang==='uk'?'uk':'es';document.title=t('title');
   document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
@@ -664,6 +730,51 @@ $('bkFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{KC.res
   let gone=false;const close=()=>{if(gone)return;gone=true;sp.classList.add('out');setTimeout(()=>sp.hidden=true,700)};
   sp.addEventListener('click',close);document.addEventListener('keydown',close,{once:true});setTimeout(close,5300);
   {const m=sp.querySelector('.medal'),c=sp.querySelector('.splash-card');if(m&&c){const y=c.getBoundingClientRect().top+m.offsetTop+m.offsetHeight/2;sp.style.setProperty('--mdy',Math.round(innerHeight/2-y)+'px')}}
+})();
+
+/* ---------- 19 de febrero: cumpleaños de Katia ---------- */
+(function(){
+  const now=new Date(),force=/[?&]cumple=1/.test(location.search);
+  if(!(force||(now.getMonth()===1&&now.getDate()===19)))return;
+  const key='katia-bday-shown';try{if(!force&&sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1');sessionStorage.setItem('katia-splash','1')}catch(e){}
+  const sp=$('splash');if(sp)sp.hidden=true;
+  const B=$('bday');B.hidden=false;const U=lang==='uk';
+  $('bH').innerHTML=U?'З днем народження, <em>Катю</em>!':'¡Feliz cumpleaños, <em>Katia</em>!';
+  $('bP').textContent=U?'Загадай бажання і задми свічки 🎂':'Pide un deseo y sopla las velas 🎂';
+  $('bMic').textContent=U?'🎤 Задути в мікрофон':'🎤 Soplar al micrófono';
+  $('bNote').textContent=U?'Або торкнись кожної свічки.':'O toca cada vela para apagarla.';
+  $('bGo').textContent=U?'Продовжити →':'Continuar →';
+  const xs=[86,108,130,152,174],cols=['url(#cdl)','url(#cdl2)','url(#cdl)','url(#cdl2)','url(#cdl)'];
+  $('candles').innerHTML=xs.map((x,i)=>`<g class="cd" data-i="${i}"><rect x="${x-14}" y="10" width="28" height="70" fill="transparent"/>
+    <circle class="glow" cx="${x}" cy="30" r="20" fill="url(#glow)"/>
+    <rect x="${x-4.5}" y="40" width="9" height="38" rx="2.5" fill="${cols[i]}"/><path d="M${x-4.5} 48l9-5M${x-4.5} 58l9-5M${x-4.5} 68l9-5" stroke="rgba(255,255,255,.7)" stroke-width="2.4"/>
+    <line x1="${x}" y1="40" x2="${x}" y2="35" stroke="#3a2a1a" stroke-width="1.6"/>
+    <path class="fl${i%2?' b':''}" d="M${x} 16q8 10 5 16q-2 5-5 5q-3 0-5-5q-3-6 5-16z" fill="url(#flame)"/>
+    <circle class="smoke" cx="${x}" cy="30" r="5" fill="rgba(200,200,210,.8)"/></g>`).join('');
+  let left=5,done=false,stream=null,AC=null;
+  const tone=(f,d)=>{if(!KC.get('sound',true))return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.setValueAtTime(.15,AC.currentTime);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}};
+  const out=g=>{if(g.classList.contains('off'))return;g.classList.add('off');left--;tone(300+left*80,.25);if(!left)party()};
+  document.querySelectorAll('#candles .cd').forEach(g=>g.addEventListener('click',()=>out(g)));
+  function party(){if(done)return;done=true;stopMic();
+    const melody=[[392,.3],[392,.15],[440,.45],[392,.45],[523,.45],[494,.8]];let t0=0;melody.forEach(([f,d])=>{setTimeout(()=>tone(f,d+.1),t0*1000);t0+=d});
+    $('bH').innerHTML=U?'Нехай здійсниться! 🎉':'¡Que se cumpla! 🎉';
+    $('bP').textContent=U?'Бажаємо тобі чудового року, багато шоколаду, цукерок… і ще більше іспанської!':'Te deseamos un año precioso, mucho chocolate, muchas chuches… ¡y mucho más español!';
+    $('bMic').hidden=true;$('bNote').textContent='';$('bMeter').hidden=true;$('bGo').hidden=false;
+    const yk='bday-'+now.getFullYear();if(!KC.get(yk,false)){KC.set(yk,true);KC.set('pts',KC.get('pts',0)+100);$('bGift').hidden=false}
+    const sec=KC.get('eggs',[]);if(!sec.includes('cumple')){sec.push('cumple');KC.set('eggs',sec)}KC.checkBadges();confetti()}
+  function confetti(){const c=$('bconf'),x=c.getContext('2d');const d=Math.min(2,devicePixelRatio||1);c.width=innerWidth*d;c.height=innerHeight*d;x.scale(d,d);
+    const C=['#ff7ac6','#ffd23f','#4fc3ff','#8ee25d','#b388ff','#ffffff','#0057b7'];const P=Array.from({length:180},()=>({x:Math.random()*innerWidth,y:-20-Math.random()*innerHeight*.8,vy:120+Math.random()*180,vx:(Math.random()-.5)*60,r:Math.random()*6.28,vr:(Math.random()-.5)*8,w:6+Math.random()*7,c:C[Math.floor(Math.random()*C.length)]}));
+    let last=performance.now(),T=0;(function f(n){const dt=Math.min(.05,(n-last)/1000);last=n;T+=dt;x.clearRect(0,0,innerWidth,innerHeight);
+      for(const p of P){p.y+=p.vy*dt;p.x+=p.vx*dt+Math.sin(T*3+p.r)*.6;p.r+=p.vr*dt;if(p.y>innerHeight+20&&T<5)p.y=-20;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.w/2,-p.w/4,p.w,p.w/2);x.restore()}
+      if(T<9&&!B.hidden)requestAnimationFrame(f)})(last)}
+  function stopMic(){try{stream&&stream.getTracks().forEach(t=>t.stop())}catch(e){}stream=null}
+  $('bMic').onclick=async()=>{try{stream=await navigator.mediaDevices.getUserMedia({audio:true});AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+      const an=AC.createAnalyser();an.fftSize=512;AC.createMediaStreamSource(stream).connect(an);const buf=new Uint8Array(an.fftSize);
+      $('bMeter').hidden=false;$('bMic').hidden=true;$('bNote').textContent=U?'Дуй сильно в мікрофон!':'¡Sopla fuerte hacia el micrófono!';let acc=0;
+      (function lp(){if(done||!stream)return;an.getByteTimeDomainData(buf);let sum=0;for(const v of buf){const q=(v-128)/128;sum+=q*q}const rms=Math.sqrt(sum/buf.length);
+        $('bLvl').style.width=Math.min(100,rms*400)+'%';if(rms>.12){acc+=rms;if(acc>1.2){acc=0;const g=document.querySelector('#candles .cd:not(.off)');g&&out(g)}}requestAnimationFrame(lp)})()}
+    catch(e){$('bNote').textContent=U?'Мікрофон недоступний — торкнись свічок.':'No puedo usar el micrófono: toca las velas.'}};
+  $('bGo').onclick=()=>{stopMic();B.classList.add('out');setTimeout(()=>{B.hidden=true;drawBadges();paint()},650);if(force)try{history.replaceState(null,'','./')}catch(e){}};
 })();
 </script>
 <script>

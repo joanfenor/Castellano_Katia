@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3f8fd8">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Jardín de girasoles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;600;700;800&display=swap">
+<style>
+:root{--ink:#1d2a3a;--card:#fffdf5;--display:"Young Serif",Georgia,serif;--body:"Figtree",system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{margin:0;height:100%;overflow:hidden;background:#7cc0ff;font-family:var(--body);color:var(--ink);-webkit-user-select:none;user-select:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:manipulation}
+.top{position:fixed;left:0;right:0;top:0;z-index:5;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;
+  padding:calc(env(safe-area-inset-top,0px) + 10px) max(14px,env(safe-area-inset-right,0px)) 10px max(14px,env(safe-area-inset-left,0px))}
+.back{width:44px;height:44px;border-radius:50%;border:3px solid #fff;background:rgba(255,255,255,.92);display:grid;place-items:center;color:#2a5f9e;box-shadow:0 4px 12px rgba(0,40,90,.3);text-decoration:none}
+.ttl{background:rgba(255,255,255,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:3px solid #fff;border-radius:18px;padding:6px 14px;box-shadow:0 6px 18px rgba(0,40,90,.22);min-width:0}
+.ttl h1{font:400 clamp(19px,5.6vw,24px)/1.1 var(--display);margin:0;color:#7a4a00}
+.ttl p{margin:2px 0 0;font:600 13px var(--body);color:#56708c}
+.hint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:5;background:rgba(255,255,255,.9);border-radius:999px;padding:7px 14px;font:700 13px var(--body);color:#3d5a2a;box-shadow:0 3px 10px rgba(0,0,0,.18);white-space:nowrap;max-width:calc(100% - 28px);overflow:hidden;text-overflow:ellipsis}
+.empty{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);z-index:4;width:min(340px,calc(100% - 32px));background:rgba(255,253,245,.94);border:4px solid #fff;border-radius:22px;padding:18px;text-align:center;box-shadow:0 18px 40px rgba(0,40,90,.25)}
+.empty h2{font:400 22px var(--display);margin:0 0 6px;color:#7a4a00}.empty p{margin:0;color:#56708c;line-height:1.45}
+.card{position:fixed;z-index:8;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 56px);transform:translateX(-50%);width:min(340px,calc(100% - 32px));
+  background:var(--card);border:4px solid #ffd23f;border-radius:22px;padding:14px 16px;box-shadow:0 20px 40px rgba(0,40,90,.3);display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;animation:up .35s cubic-bezier(.2,1.5,.4,1)}
+@keyframes up{from{transform:translate(-50%,30px);opacity:0}}
+.card .es{font:400 26px/1.15 var(--display);color:#1d2a3a;overflow-wrap:anywhere}
+.card .uk{grid-column:1;color:#56708c;font-size:16px}
+.card .k{grid-column:1/-1;font:800 11px var(--body);letter-spacing:.12em;text-transform:uppercase;color:#c48a00}
+.card .say{grid-column:2;grid-row:2/4;width:48px;height:48px;border-radius:50%;border:0;background:linear-gradient(180deg,#ffd84a,#e2a400);color:#5a3300;box-shadow:0 4px 0 #b07c00;display:grid;place-items:center;cursor:pointer}
+.card .dots{grid-column:1/-1;display:flex;gap:4px;margin-top:4px}.card .dots i{width:9px;height:9px;border-radius:50%;background:#e8e2cf}.card .dots i.on{background:#f0b400}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div class="top">
+  <a class="back" href="./" aria-label="Inicio"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg></a>
+  <div class="ttl"><h1 id="h1">Tu jardín de girasoles</h1><p id="count"></p></div>
+</div>
+<div class="empty" id="empty" hidden><h2 id="eH">Tu jardín está esperando</h2><p id="eP"></p></div>
+<div class="hint" id="hint"></div>
+<div class="card" id="card" hidden></div>
+<script src="config.js"></script>
+<script src="comun.js"></script>
+<script src="palabras.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const L=(es,uk)=>KC.lang()==='uk'?uk:es;
+const cv=$('cv'),ctx=cv.getContext('2d');let W=0,H=0,DPR=1;
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- datos: palabras dominadas y formas verbales ---------- */
+const UK={},TK={};for(const t of PALABRAS)for(const [es,uk] of t.w){UK[es]=uk;TK[es]=L(t.es,t.uk)}
+let ST={},VST={};try{ST=JSON.parse(localStorage.getItem('kvoc-st'))||{}}catch(e){}VST=KC.get('vst',{});
+const demo=/[?&]demo=1/.test(location.search);
+if(demo){const all=Object.keys(UK);ST={};all.slice(0,600).forEach((w,i)=>{if(i%3===0)ST[w]=[3+(i%7)%3,0];else if(i%11===0)ST[w]=[1,0]});VST={};for(let i=0;i<120;i++)VST['ser|'+i+'|'+(i%6)]=[3,0]}
+const words=Object.entries(ST).filter(([w,v])=>UK[w]&&v[0]>=1).map(([w,v])=>({w,b:v[0]}));
+const sun=words.filter(x=>x.b>=3).sort((a,b)=>b.b-a.b).slice(0,220);
+const buds=words.filter(x=>x.b<3).slice(0,90);
+const verbs=Object.values(VST).filter(v=>v[0]>=3).length;
+const nSun=words.filter(x=>x.b>=3).length;
+
+/* ---------- semilla estable ---------- */
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rnd(seed){let x=seed||1;return()=>{x^=x<<13;x^=x>>>17;x^=x<<5;return((x>>>0)%100000)/100000}}
+
+/* ---------- sprites con textura (se dibujan una vez) ---------- */
+const PET=[['#ffe066','#f5a300','#c47a00'],['#ffd23f','#f08c00','#b35f00'],['#fff08a','#f7b500','#cf8a00']];
+function headSprite(v,S=200){const c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d');const R=S/2,cx=R,cy=R;const [p0,p1,p2]=PET[v];
+  for(const layer of[0,1]){const n=layer?21:21,len=R*(layer?.82:.95),wid=R*(layer?.17:.19),off=layer?Math.PI/n:0;
+    for(let i=0;i<n;i++){const a=i/n*Math.PI*2+off;x.save();x.translate(cx,cy);x.rotate(a);
+      const g=x.createLinearGradient(R*.3,0,len,0);g.addColorStop(0,layer?p2:p1);g.addColorStop(.45,layer?p1:p0);g.addColorStop(1,layer?p0:p1);x.fillStyle=g;
+      x.beginPath();x.moveTo(R*.3,0);x.bezierCurveTo(R*.45,-wid,len*.82,-wid*.9,len,0);x.bezierCurveTo(len*.82,wid*.9,R*.45,wid,R*.3,0);x.fill();
+      x.strokeStyle='rgba(150,80,0,.25)';x.lineWidth=S*.004;x.beginPath();x.moveTo(R*.36,0);x.lineTo(len*.92,0);x.stroke();x.restore()}}
+  const g=x.createRadialGradient(cx-R*.08,cy-R*.1,R*.02,cx,cy,R*.42);g.addColorStop(0,'#8a5a2b');g.addColorStop(.6,'#5a3417');g.addColorStop(1,'#2e1808');
+  x.fillStyle=g;x.beginPath();x.arc(cx,cy,R*.42,0,Math.PI*2);x.fill();
+  const GA=Math.PI*(3-Math.sqrt(5));for(let i=0;i<260;i++){const r=R*.4*Math.sqrt(i/260),a=i*GA;const sx=cx+Math.cos(a)*r,sy=cy+Math.sin(a)*r;
+    x.fillStyle=i<40?'#b07a3a':i%2?'#3a2010':'#6e4520';x.beginPath();x.arc(sx,sy,R*.022*(1-r/(R*.5))+R*.006,0,Math.PI*2);x.fill()}
+  x.fillStyle='rgba(255,255,255,.12)';x.beginPath();x.ellipse(cx-R*.12,cy-R*.15,R*.18,R*.1,-.5,0,Math.PI*2);x.fill();return c}
+function budSprite(S=80){const c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d');const R=S/2;
+  const g=x.createRadialGradient(R*.8,R*.7,R*.1,R,R,R*.6);g.addColorStop(0,'#a6dc6a');g.addColorStop(1,'#3d8a22');x.fillStyle=g;
+  x.beginPath();x.ellipse(R,R,R*.42,R*.55,0,0,Math.PI*2);x.fill();x.fillStyle='#ffd23f';for(let i=-2;i<=2;i++){x.beginPath();x.ellipse(R+i*R*.14,R*.5,R*.08,R*.2,i*.25,0,Math.PI*2);x.fill()}
+  x.strokeStyle='rgba(30,80,10,.5)';x.lineWidth=2;x.beginPath();x.moveTo(R,R*.5);x.quadraticCurveTo(R*.7,R,R,R*1.5);x.stroke();return c}
+function daisySprite(col,S=60){const c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d');const R=S/2;
+  for(let i=0;i<10;i++){x.save();x.translate(R,R);x.rotate(i/10*Math.PI*2);const g=x.createLinearGradient(0,0,R*.9,0);g.addColorStop(0,'#fff');g.addColorStop(1,col);x.fillStyle=g;x.beginPath();x.ellipse(R*.5,0,R*.42,R*.15,0,0,Math.PI*2);x.fill();x.restore()}
+  const g=x.createRadialGradient(R*.9,R*.9,1,R,R,R*.25);g.addColorStop(0,'#fff6a0');g.addColorStop(1,'#f0a800');x.fillStyle=g;x.beginPath();x.arc(R,R,R*.24,0,Math.PI*2);x.fill();return c}
+const HEADS=[0,1,2].map(v=>headSprite(v)),BUD=budSprite(),DAISY=['#ffffff','#ffb3d9','#c9b3ff','#9fd6ff'].map(c=>daisySprite(c));
+
+/* ---------- escena ---------- */
+let F=[],D=[],clouds=[],grass=null,HOR=0;
+function layout(){DPR=Math.min(2.5,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
+  HOR=H*.42;const top=HOR+10,bot=H-30;
+  F=[...sun.map(x=>({...x,kind:'sun'})),...buds.map(x=>({...x,kind:'bud'}))].map(o=>{const r=rnd(hash(o.w));const d=Math.pow(r(),.8);
+    const y=top+d*(bot-top),sc=.35+d*.75;const sz=o.kind==='sun'?(26+o.b*7)*sc*Math.min(1.25,W/420+.25):16*sc;
+    return {...o,x:16+r()*(W-32),y,sz,stem:(o.kind==='sun'?70+o.b*12:36)*sc,ph:r()*6.28,v:Math.floor(r()*3),rot:r()*6.28}}).sort((a,b)=>a.y-b.y);
+  const r=rnd(77);D=Array.from({length:Math.min(400,verbs)},()=>{const d=r();return {x:r()*W,y:HOR+18+d*(H-HOR-24),sz:(6+d*12),c:Math.floor(r()*4),ph:r()*6}}).sort((a,b)=>a.y-b.y);
+  clouds=Array.from({length:5},(_,i)=>({x:r()*W,y:H*.06+r()*H*.22,s:.6+r()*.8,v:6+r()*10}));
+  grass=document.createElement('canvas');grass.width=W*DPR;grass.height=(H-HOR+40)*DPR;const g=grass.getContext('2d');g.scale(DPR,DPR);paintGround(g,W,H-HOR+40)}
+function paintGround(g,w,h){const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#8fd14f');gr.addColorStop(.35,'#5cb338');gr.addColorStop(1,'#2f7d1e');g.fillStyle=gr;
+  g.beginPath();g.moveTo(0,30);for(let x=0;x<=w;x+=20)g.lineTo(x,30+Math.sin(x*.012)*14+Math.sin(x*.031)*6);g.lineTo(w,h);g.lineTo(0,h);g.fill();
+  const r=rnd(5);for(let i=0;i<w*h/28;i++){const x=r()*w,y=30+r()*(h-30),d=y/h;g.strokeStyle=`hsla(${95+r()*30},${50+r()*20}%,${22+r()*30+(1-d)*10}%,.55)`;g.lineWidth=.6+d*1.4;
+    g.beginPath();g.moveTo(x,y);g.quadraticCurveTo(x+(r()-.5)*4,y-3-d*8,x+(r()-.5)*6,y-5-d*14);g.stroke()}
+  for(let i=0;i<60;i++){const x=r()*w,y=40+r()*(h-40);g.fillStyle=['#fff','#ffe066','#ff9ec7'][i%3];g.globalAlpha=.7;g.beginPath();g.arc(x,y,1.2+r()*1.6,0,7);g.fill()}g.globalAlpha=1}
+function hills(t){const g=ctx.createLinearGradient(0,HOR-80,0,HOR+20);g.addColorStop(0,'#9ccfa0');g.addColorStop(1,'#6fae6a');ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(0,HOR+10);
+  for(let x=0;x<=W;x+=16)ctx.lineTo(x,HOR-30-Math.sin(x*.006+1)*30-Math.sin(x*.017)*10);ctx.lineTo(W,HOR+10);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(0,HOR-6,W,16)}
+function sky(t){const g=ctx.createLinearGradient(0,0,0,HOR);g.addColorStop(0,'#3f8fd8');g.addColorStop(.7,'#9fd3ff');g.addColorStop(1,'#fff1c4');ctx.fillStyle=g;ctx.fillRect(0,0,W,HOR+40);
+  const sx=W*.82,sy=H*.16;ctx.save();ctx.translate(sx,sy);ctx.rotate(t*.05);ctx.fillStyle='rgba(255,236,150,.25)';for(let i=0;i<12;i++){ctx.rotate(Math.PI/6);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(W*.6,-18);ctx.lineTo(W*.6,18);ctx.fill()}ctx.restore();
+  const s=ctx.createRadialGradient(sx,sy,4,sx,sy,60);s.addColorStop(0,'#fffbe0');s.addColorStop(.45,'#ffd84a');s.addColorStop(.5,'rgba(255,210,70,.6)');s.addColorStop(1,'rgba(255,210,70,0)');ctx.fillStyle=s;ctx.beginPath();ctx.arc(sx,sy,60,0,7);ctx.fill();
+  for(const c of clouds){const x=((c.x+t*c.v)%(W+200))-100;cloud(x,c.y,c.s)}}
+function cloud(x,y,s){ctx.save();ctx.translate(x,y);ctx.scale(s,s);const g=ctx.createLinearGradient(0,-30,0,20);g.addColorStop(0,'#fff');g.addColorStop(1,'#dbe9f7');ctx.fillStyle=g;ctx.beginPath();
+  ctx.arc(-30,0,20,0,7);ctx.arc(0,-12,28,0,7);ctx.arc(30,-2,22,0,7);ctx.arc(55,6,14,0,7);ctx.rect(-30,0,85,20);ctx.fill();ctx.restore()}
+function leaf(x,y,dir,s){ctx.save();ctx.translate(x,y);ctx.scale(dir,1);const g=ctx.createLinearGradient(0,0,s,-s*.4);g.addColorStop(0,'#2f7d1e');g.addColorStop(1,'#7cc04a');ctx.fillStyle=g;
+  ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(s*.5,-s*.55,s,-s*.25);ctx.quadraticCurveTo(s*.5,s*.15,0,0);ctx.fill();ctx.strokeStyle='rgba(20,60,10,.35)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(s*.85,-s*.25);ctx.stroke();ctx.restore()}
+let sel=null;
+function draw(t){sky(t);hills(t);ctx.drawImage(grass,0,HOR-40,W,H-HOR+40);
+  let di=0;
+  for(const f of F){while(di<D.length&&D[di].y<f.y){const d=D[di++];const sw=RM?0:Math.sin(t*1.5+d.ph)*2;ctx.strokeStyle='#3d8a22';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(d.x+sw,d.y-d.sz*1.4);ctx.stroke();ctx.drawImage(DAISY[d.c],d.x+sw-d.sz/2,d.y-d.sz*1.4-d.sz/2,d.sz,d.sz)}
+    const sw=RM?0:Math.sin(t*1.1+f.ph)*f.sz*.12;const hx=f.x+sw,hy=f.y-f.stem;f.hx=hx;f.hy=hy;
+    ctx.fillStyle='rgba(20,60,10,.25)';ctx.beginPath();ctx.ellipse(f.x,f.y,f.sz*.35,f.sz*.08,0,0,7);ctx.fill();
+    const sg=ctx.createLinearGradient(f.x-3,0,f.x+3,0);sg.addColorStop(0,'#3d8a22');sg.addColorStop(.5,'#7cc04a');sg.addColorStop(1,'#2f6d18');ctx.strokeStyle=sg;ctx.lineWidth=Math.max(2,f.sz*.09);ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.quadraticCurveTo(f.x+sw*.2,f.y-f.stem*.5,hx,hy);ctx.stroke();
+    if(f.kind==='sun'){leaf(f.x+sw*.1,f.y-f.stem*.35,1,f.sz*.55);leaf(f.x+sw*.15,f.y-f.stem*.55,-1,f.sz*.45);
+      const s=f.sz*(sel===f?1.25:1);ctx.save();ctx.translate(hx,hy);ctx.rotate(f.rot+(RM?0:Math.sin(t*.8+f.ph)*.08));
+      if(sel===f){ctx.shadowColor='rgba(255,230,120,.95)';ctx.shadowBlur=24}ctx.drawImage(HEADS[f.v],-s/2,-s/2,s,s);ctx.restore()}
+    else{const s=f.sz*1.6;ctx.drawImage(BUD,hx-s/2,hy-s/2,s,s)}}
+  while(di<D.length){const d=D[di++];ctx.drawImage(DAISY[d.c],d.x-d.sz/2,d.y-d.sz*1.4-d.sz/2,d.sz,d.sz)}
+  for(const p of sparks){p.t+=1/60;ctx.globalAlpha=Math.max(0,1-p.t);ctx.fillStyle='#fff3a0';ctx.beginPath();ctx.arc(p.x+p.vx*p.t,p.y+p.vy*p.t+p.t*p.t*60,2.4,0,7);ctx.fill()}ctx.globalAlpha=1;sparks=sparks.filter(p=>p.t<1)}
+let sparks=[];
+function loop(now){draw(now/1000);requestAnimationFrame(loop)}
+
+/* ---------- tocar un girasol ---------- */
+cv.addEventListener('click',e=>{let best=null,bd=1e9;for(const f of F){if(f.hx==null)continue;const d=Math.hypot(e.clientX-f.hx,e.clientY-f.hy);if(d<Math.max(24,f.sz*.6)&&(!best||f.y>best.y)){best=f;bd=d}}
+  if(!best){sel=null;$('card').hidden=true;return}sel=best;
+  for(let i=0;i<14;i++){const a=Math.random()*6.28,v=40+Math.random()*80;sparks.push({x:best.hx,y:best.hy,vx:Math.cos(a)*v,vy:Math.sin(a)*v-40,t:0})}
+  const c=$('card');const b=best.b;c.innerHTML=`<span class="k">${best.kind==='sun'?L('Palabra dominada','Вивчене слово'):L('Creciendo…','Росте…')} · ${TK[best.w]||''}</span><span class="es">${best.w}</span><span class="uk" lang="uk">${UK[best.w]||''}</span>
+    <button class="say" aria-label="${L('Escuchar','Слухати')}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
+    <span class="dots">${[0,1,2,3,4].map(i=>`<i class="${i<b?'on':''}"></i>`).join('')}</span>`;
+  c.hidden=false;c.style.animation='none';void c.offsetWidth;c.style.animation='';c.querySelector('.say').onclick=ev=>{ev.stopPropagation();KC.say&&KC.say(best.w)};KC.say&&KC.get('sound',true)&&KC.say(best.w)});
+
+/* ---------- textos ---------- */
+function texts(){document.documentElement.lang=KC.lang();document.title=L('Jardín de girasoles','Сад соняшників');
+  $('h1').textContent=L('Tu jardín de girasoles','Твій сад соняшників');
+  $('count').textContent=L(`${nSun} girasoles · ${buds.length} brotes · ${verbs} flores de verbos`,`${nSun} соняшників · ${buds.length} паростків · ${verbs} квіток дієслів`);
+  $('hint').textContent=nSun?L('Toca un girasol para ver su palabra','Торкнись соняшника, щоб побачити слово'):L('Cada palabra dominada es un girasol 🌻','Кожне вивчене слово — це соняшник 🌻');
+  $('eH').textContent=L('Tu jardín está esperando','Твій сад чекає');
+  $('eP').textContent=L('Cada palabra que aciertes 3 veces seguidas en Vocabulario se convertirá en un girasol. Las formas verbales dominadas serán florecillas en la hierba.','Кожне слово, яке ти правильно назвеш 3 рази поспіль у «Словах», стане соняшником. Вивчені форми дієслів стануть квіточками в траві.');
+  $('empty').hidden=!!(F.length||D.length)}
+addEventListener('resize',()=>{layout();sel=null;$('card').hidden=true});
+layout();texts();requestAnimationFrame(loop);
+{const sec=KC.get('eggs',[]);if(!sec.includes('jardin')){sec.push('jardin');KC.set('eggs',sec);KC.checkBadges()}}
+if('serviceWorker' in navigator&&location.protocol!=='file:'){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+</script>
+</body>
+</html>

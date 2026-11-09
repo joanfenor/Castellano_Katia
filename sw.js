@@ -1,7 +1,7 @@
 // Cambia VERSION cada vez que subas archivos nuevos para que el móvil los actualice.
-const VERSION='v17';
+const VERSION='v19';
 const CACHE='katia-'+VERSION;
-const FILES=['./','index.html','verbos.html','vocabulario.html','gramatica.html','comun.js','config.js','manifest.webmanifest','icon-192.png','icon-512.png','icon-maskable-512.png','apple-touch-icon.png'];
+const FILES=['./','index.html','verbos.html','vocabulario.html','gramatica.html','chuches.html','jardin.html','palabras.js','comun.js','config.js','manifest.webmanifest','icon-192.png','icon-512.png','icon-maskable-512.png','apple-touch-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE&&k!=='katia-fonts').map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{

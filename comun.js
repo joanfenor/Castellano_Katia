@@ -73,12 +73,15 @@ const BADGES=[
  ['r10','10 repasos del día','10 щоденних повторень',s=>s.daily>=10],
  ['t200','200 puntos en contrarreloj','200 балів на час',s=>s.timer>=200],
  ['g5','Las 5 dudas típicas practicadas','Усі 5 типових труднощів',s=>s.dudas>=5],
- ['s5','Las 5 situaciones completadas','Усі 5 ситуацій',s=>s.sits>=5]
+ ['s5','Las 5 situaciones completadas','Усі 5 ситуацій',s=>s.sits>=5],
+ ['x1','Secreto: lluvia de chuches','Секрет: дощ із цукерок',s=>s.eggs.includes('chuches'),1],
+ ['x2','Secreto: jardín de girasoles','Секрет: сад соняшників',s=>s.eggs.includes('jardin'),1],
+ ['x3','Secreto: feliz cumpleaños','Секрет: з днем народження',s=>s.eggs.includes('cumple'),1]
 ];
 function stats(){const dst=get('dst',{});
   return {hits:get('hits',0),streak:streak(),words:countBox('kvoc-st',3),verbs:countBox('vst',3),best:get('best',0),pts:get('pts',0),
-    daily:get('dailydone',0),timer:tbest(),dudas:Object.values(dst).filter(n=>n>=10).length,sits:get('sits',[]).length}}
-function badges(){const s=stats(),have=new Set(get('badges',[]));return BADGES.map(([id,es,uk,f])=>({id,name:L(es,uk),on:have.has(id)||f(s)}))}
+    daily:get('dailydone',0),timer:tbest(),dudas:Object.values(dst).filter(n=>n>=10).length,sits:get('sits',[]).length,eggs:get('eggs',[])}}
+function badges(){const s=stats(),have=new Set(get('badges',[]));return BADGES.map(([id,es,uk,f,sec])=>({id,name:L(es,uk),on:have.has(id)||f(s),secret:!!sec}))}
 function checkBadges(){const s=stats(),have=get('badges',[]);let changed=false;
   for(const [id,es,uk,f] of BADGES)if(!have.includes(id)&&f(s)){have.push(id);changed=true;toast(L('¡Nuevo logro! ','Нове досягнення! ')+'<b>'+L(es,uk)+'</b>')}
   if(changed)set('badges',have)}
@@ -168,7 +171,7 @@ function mountExit(){const b=document.getElementById('exitBtn');if(!b)return;
   b.setAttribute('aria-label',L('Salir','Вийти'));b.title=L('Salir','Вийти');
   b.onclick=()=>{try{window.close()}catch(e){}
     setTimeout(()=>{if(!document.hidden)toast(L('El móvil no deja que la app se cierre sola. Para salir, pulsa «Atrás» o ciérrala desde las apps abiertas. Tu progreso ya está guardado.','Телефон не дозволяє застосунку закритися самому. Щоб вийти, натисни «Назад» або закрий його у списку відкритих застосунків. Твій прогрес уже збережено.'))},400)}}
-function mountHdr(){mountFlag();mountSound();mountExit();hdrH();const h=document.querySelector('header');if(h&&window.ResizeObserver)new ResizeObserver(hdrH).observe(h)}
+function mountHdr(){mountFaceTaps();mountFlag();mountSound();mountExit();hdrH();const h=document.querySelector('header');if(h&&window.ResizeObserver)new ResizeObserver(hdrH).observe(h)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mountHdr);else mountHdr();
 function hdrH(){const h=document.querySelector('header');if(h)document.documentElement.style.setProperty('--hdrh',h.offsetHeight+'px');const b=document.querySelector('.kc-daily');if(b)document.documentElement.style.setProperty('--kcd',b.offsetHeight+'px')}
 addEventListener('load',hdrH);addEventListener('resize',hdrH);
@@ -190,9 +193,18 @@ function mountFlag(){
   const b=document.createElement('button');b.className='kc-flag';side.prepend(b);
   const paint=()=>{const l=lang();b.innerHTML=l==='uk'?FLAG_UK:FLAG_ES;
     b.setAttribute('aria-label',l==='uk'?'Мова: українська. Змінити на іспанську':'Idioma: español. Cambiar a ucraniano');b.title=b.getAttribute('aria-label')};
-  b.onclick=()=>{(lang()==='uk'?es:uk).click();setTimeout(paint,0)};
+  let lp=0,longDone=false;
+  b.addEventListener('pointerdown',()=>{longDone=false;clearTimeout(lp);lp=setTimeout(()=>{longDone=true;try{navigator.vibrate&&navigator.vibrate(30)}catch(e){}location.href='jardin.html'},900)});
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>clearTimeout(lp)));
+  b.addEventListener('contextmenu',e=>e.preventDefault());
+  b.onclick=()=>{if(longDone){longDone=false;return}(lang()==='uk'?es:uk).click();setTimeout(paint,0)};
   paint();
 }
+/* secreto: 3 toques seguidos en la cara abren la lluvia de chuches */
+function mountFaceTaps(){const f=document.getElementById('face');if(!f||f.dataset.taps)return;f.dataset.taps=1;f.style.cursor='pointer';
+  let n=0,t0=0;f.addEventListener('click',()=>{const now=Date.now();if(now-t0>2500)n=0;if(!n)t0=now;n++;
+    f.animate&&f.animate([{transform:'scale(1)'},{transform:'scale(1.12) rotate(-6deg)'},{transform:'scale(1)'}],{duration:220});
+    if(n>=3){n=0;location.href='chuches.html'}})}
 
 /* ---------- teclado del móvil: mantener la cabecera visible ---------- */
 if(window.visualViewport){const vv=window.visualViewport;
