@@ -415,6 +415,19 @@ body{padding-top:calc(var(--hdrh,130px) + var(--kcd,0px))}
 .homebadge~.hcol .eyebrow{padding-right:22px}
 .hcol .lvl .pts{color:var(--muted);font-weight:600}
 @media (max-width:380px){.hellohome>.face{width:60px;height:60px}}
+
+/* nivel completo, puntos junto a la barra */
+.hcol .lvl{display:block!important;white-space:normal!important;margin:0!important;font-size:12.5px;line-height:1.3}
+.hcol .lvl>span:first-child{overflow:visible}
+.barrow{display:flex;align-items:center;gap:8px;min-width:0}
+.barrow .bar{flex:1;min-width:0;height:8px}
+.barrow .pts{flex:none;font-size:12px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+#nextGift{display:none!important}
+.hcol{gap:4px}
+.hellohome{position:relative}
+.homebadge{position:absolute;top:-8px;right:-8px;width:32px;height:32px;border-radius:50%;background:var(--card);color:var(--tile);display:grid;place-items:center;box-shadow:0 3px 10px rgba(0,30,80,.3);z-index:2;border:2px solid var(--line);padding:0;cursor:pointer}
+.exitbadge{color:var(--bad)}
+.homebadge~.hcol .eyebrow{padding-right:22px}
 </style>
 </head>
 <body>
@@ -431,11 +444,12 @@ body{padding-top:calc(var(--hdrh,130px) + var(--kcd,0px))}
 <header>
   <div class="wrap hdr">
     <div class="hello hellohome">
+      <button class="homebadge exitbadge" id="exitBtn" aria-label="Salir" title="Salir"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v8"/><path d="M6.3 7.3a8 8 0 1 0 11.4 0"/></svg></button>
       <div class="face" id="face" aria-hidden="true"></div>
       <div class="hcol">
         <div class="eyebrow" data-i18n="eyebrow">El español de Katia</div>
-        <div class="lvl"><span><span id="lvlName">Nivel 1</span><span id="combo" class="combo" hidden>×2</span></span><span class="pts" id="lvlPts">0 / 150</span></div>
-        <div class="bar"><i id="lvlFill"></i></div>
+        <div class="lvl"><span><span id="lvlName">Nivel 1</span><span id="combo" class="combo" hidden>×2</span></span></div>
+        <div class="barrow"><div class="bar"><i id="lvlFill"></i></div><span class="pts" id="lvlPts">0/150 ★</span></div>
         <p class="note" id="nextGift"></p>
       </div>
     </div>

@@ -396,6 +396,15 @@ body{padding-top:calc(var(--hdrh,130px) + var(--kcd,0px))}
 .homebadge~.hcol .eyebrow{padding-right:22px}
 .hcol .lvl .pts{color:var(--muted);font-weight:600}
 @media (max-width:380px){.hellohome>.face{width:60px;height:60px}}
+
+/* nivel completo, puntos junto a la barra */
+.hcol .lvl{display:block!important;white-space:normal!important;margin:0!important;font-size:12.5px;line-height:1.3}
+.hcol .lvl>span:first-child{overflow:visible}
+.barrow{display:flex;align-items:center;gap:8px;min-width:0}
+.barrow .bar{flex:1;min-width:0;height:8px}
+.barrow .pts{flex:none;font-size:12px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+#nextGift{display:none!important}
+.hcol{gap:4px}
 </style>
 </head>
 <body>
@@ -406,8 +415,8 @@ body{padding-top:calc(var(--hdrh,130px) + var(--kcd,0px))}
       <div class="face" id="face" aria-hidden="true"></div>
       <div class="hcol">
         <div class="eyebrow" data-i18n="eyebrow">Dudas y situaciones</div>
-        <div class="lvl"><span><span id="lvlName">Nivel 1</span><span id="combo" class="combo" hidden>×2</span></span><span class="pts" id="lvlPts">0 / 150</span></div>
-        <div class="bar"><i id="lvlFill"></i></div>
+        <div class="lvl"><span><span id="lvlName">Nivel 1</span><span id="combo" class="combo" hidden>×2</span></span></div>
+        <div class="barrow"><div class="bar"><i id="lvlFill"></i></div><span class="pts" id="lvlPts">0/150 ★</span></div>
         <p class="note" id="nextGift"></p>
       </div>
       <div class="stats" hidden>

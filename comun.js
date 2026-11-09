@@ -164,7 +164,11 @@ function mountSound(){
   b.onclick=()=>{const on=!get('sound',true);set('sound',on);paint();dispatchEvent(new CustomEvent('kc-sound',{detail:on}))};
   paint();
 }
-function mountHdr(){mountFlag();mountSound();hdrH();const h=document.querySelector('header');if(h&&window.ResizeObserver)new ResizeObserver(hdrH).observe(h)}
+function mountExit(){const b=document.getElementById('exitBtn');if(!b)return;
+  b.setAttribute('aria-label',L('Salir','Вийти'));b.title=L('Salir','Вийти');
+  b.onclick=()=>{try{window.close()}catch(e){}
+    setTimeout(()=>{if(!document.hidden)toast(L('El móvil no deja que la app se cierre sola. Para salir, pulsa «Atrás» o ciérrala desde las apps abiertas. Tu progreso ya está guardado.','Телефон не дозволяє застосунку закритися самому. Щоб вийти, натисни «Назад» або закрий його у списку відкритих застосунків. Твій прогрес уже збережено.'))},400)}}
+function mountHdr(){mountFlag();mountSound();mountExit();hdrH();const h=document.querySelector('header');if(h&&window.ResizeObserver)new ResizeObserver(hdrH).observe(h)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mountHdr);else mountHdr();
 function hdrH(){const h=document.querySelector('header');if(h)document.documentElement.style.setProperty('--hdrh',h.offsetHeight+'px');const b=document.querySelector('.kc-daily');if(b)document.documentElement.style.setProperty('--kcd',b.offsetHeight+'px')}
 addEventListener('load',hdrH);addEventListener('resize',hdrH);
