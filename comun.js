@@ -171,7 +171,7 @@ function mountExit(){const b=document.getElementById('exitBtn');if(!b)return;
   b.setAttribute('aria-label',L('Salir','Вийти'));b.title=L('Salir','Вийти');
   b.onclick=()=>{try{window.close()}catch(e){}
     setTimeout(()=>{if(!document.hidden)toast(L('El móvil no deja que la app se cierre sola. Para salir, pulsa «Atrás» o ciérrala desde las apps abiertas. Tu progreso ya está guardado.','Телефон не дозволяє застосунку закритися самому. Щоб вийти, натисни «Назад» або закрий його у списку відкритих застосунків. Твій прогрес уже збережено.'))},400)}}
-function mountHdr(){mountFaceTaps();mountFlag();mountSound();mountExit();hdrH();const h=document.querySelector('header');if(h&&window.ResizeObserver)new ResizeObserver(hdrH).observe(h)}
+function mountHdr(){eggCss();mountFaceTaps();mountFlag();mountSound();mountExit();hdrH();const h=document.querySelector('header');if(h&&window.ResizeObserver)new ResizeObserver(hdrH).observe(h)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mountHdr);else mountHdr();
 function hdrH(){const h=document.querySelector('header');if(h)document.documentElement.style.setProperty('--hdrh',h.offsetHeight+'px');const b=document.querySelector('.kc-daily');if(b)document.documentElement.style.setProperty('--kcd',b.offsetHeight+'px')}
 addEventListener('load',hdrH);addEventListener('resize',hdrH);
@@ -193,19 +193,44 @@ function mountFlag(){
   const b=document.createElement('button');b.className='kc-flag';side.prepend(b);
   const paint=()=>{const l=lang();b.innerHTML=l==='uk'?FLAG_UK:FLAG_ES;
     b.setAttribute('aria-label',l==='uk'?'Мова: українська. Змінити на іспанську':'Idioma: español. Cambiar a ucraniano');b.title=b.getAttribute('aria-label')};
-  let lp=0,longDone=false;
-  b.addEventListener('pointerdown',()=>{longDone=false;clearTimeout(lp);lp=setTimeout(()=>{longDone=true;try{navigator.vibrate&&navigator.vibrate(30)}catch(e){}location.href='jardin.html'},900)});
-  ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>clearTimeout(lp)));
+  let lp=0,longDone=false,cd=null,iv=0,started=false;
+  const stopCd=()=>{clearTimeout(lp);clearInterval(iv);if(cd){const c=cd;cd=null;c.classList.add('out');setTimeout(()=>c.remove(),250)}};
+  b.addEventListener('pointerdown',()=>{longDone=false;started=false;stopCd();
+    lp=setTimeout(()=>{started=true;eggCss();const r=b.getBoundingClientRect();cd=document.createElement('div');cd.className='kc-cd';
+      cd.style.left=(r.left+r.width/2)+'px';cd.style.top=(r.bottom+10)+'px';cd.innerHTML='<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="26" class="bg"/><circle cx="30" cy="30" r="26" class="fg"/></svg><b>3</b><span>🌻</span>';
+      document.body.appendChild(cd);let n=3;try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}
+      iv=setInterval(()=>{n--;if(!cd)return;if(n>0){const e=cd.querySelector('b');e.textContent=n;e.style.animation='none';void e.offsetWidth;e.style.animation='';try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}}
+        else{clearInterval(iv);longDone=true;cd.classList.add('go');try{navigator.vibrate&&navigator.vibrate(40)}catch(e){}setTimeout(()=>location.href='jardin.html',350)}},600)},350)});
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>{if(!longDone)stopCd();else clearTimeout(lp)}));
   b.addEventListener('contextmenu',e=>e.preventDefault());
-  b.onclick=()=>{if(longDone){longDone=false;return}(lang()==='uk'?es:uk).click();setTimeout(paint,0)};
+  b.onclick=()=>{if(longDone||started){longDone=false;started=false;return}(lang()==='uk'?es:uk).click();setTimeout(paint,0)};
   paint();
 }
 /* secreto: 3 toques seguidos en la cara abren la lluvia de chuches */
-function mountFaceTaps(){const f=document.getElementById('face');if(!f||f.dataset.taps)return;f.dataset.taps=1;f.style.cursor='pointer';
+function eggCss(){if(document.getElementById('kc-egg-css'))return;const st=document.createElement('style');st.id='kc-egg-css';st.textContent=`
+#face,.kc-flag{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;outline:none}
+#face:focus,.kc-flag:focus{outline:none}
+.kc-cd{position:fixed;z-index:300;width:64px;height:64px;transform:translateX(-50%);display:grid;place-items:center;pointer-events:none;
+  background:radial-gradient(circle at 40% 35%,#fffef5,#ffe58a);border-radius:50%;box-shadow:0 8px 22px rgba(0,30,80,.35),0 0 0 3px #fff;animation:kcIn .25s cubic-bezier(.2,1.6,.4,1)}
+.kc-cd svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.kc-cd .bg{fill:none;stroke:rgba(0,87,183,.15);stroke-width:5}
+.kc-cd .fg{fill:none;stroke:#0057b7;stroke-width:5;stroke-linecap:round;stroke-dasharray:164;stroke-dashoffset:164;animation:kcRing 1.8s linear forwards}
+.kc-cd b{font:800 28px/1 system-ui,sans-serif;color:#0057b7;animation:kcNum .6s ease}
+.kc-cd span{position:absolute;bottom:-8px;right:-6px;font-size:22px;animation:kcSpin 1.8s linear}
+.kc-cd.go{animation:kcGo .35s ease forwards}.kc-cd.out{opacity:0;transition:opacity .2s}
+@keyframes kcIn{from{transform:translateX(-50%) scale(.3);opacity:0}}
+@keyframes kcRing{to{stroke-dashoffset:0}}
+@keyframes kcNum{0%{transform:scale(1.8);opacity:0}40%{transform:scale(.9);opacity:1}100%{transform:scale(1)}}
+@keyframes kcSpin{to{transform:rotate(360deg)}}
+@keyframes kcGo{to{transform:translateX(-50%) scale(1.6);opacity:0}}
+@keyframes kcJump{0%{transform:translateY(0) rotate(0)}30%{transform:translateY(-9px) rotate(-10deg) scale(1.06)}55%{transform:translateY(0) rotate(8deg) scale(.96,1.04)}75%{transform:translateY(-3px) rotate(-4deg)}100%{transform:none}}
+@keyframes kcWiggle{0%,100%{transform:rotate(0)}20%{transform:rotate(-16deg) scale(1.08)}40%{transform:rotate(14deg) scale(1.1)}60%{transform:rotate(-10deg) scale(1.08)}80%{transform:rotate(6deg)}}
+@keyframes kcSpinOut{0%{transform:none}60%{transform:rotate(330deg) scale(1.25)}100%{transform:rotate(360deg) scale(1.15)}}`;document.head.appendChild(st)}
+/* secreto: 3 toques seguidos en la cara abren la lluvia de chuches */
+function mountFaceTaps(){const f=document.getElementById('face');if(!f||f.dataset.taps)return;f.dataset.taps=1;f.style.cursor='pointer';eggCss();
   let n=0,t0=0;f.addEventListener('click',()=>{const now=Date.now();if(now-t0>2500)n=0;if(!n)t0=now;n++;
-    f.animate&&f.animate([{transform:'scale(1)'},{transform:'scale(1.12) rotate(-6deg)'},{transform:'scale(1)'}],{duration:220});
-    if(n>=3){n=0;location.href='chuches.html'}})}
-
+    const anim=n>=3?'kcSpinOut .55s ease forwards':n===2?'kcWiggle .5s ease':'kcJump .5s ease';f.style.animation='none';void f.offsetWidth;f.style.animation=anim;
+    if(n>=3){n=0;try{navigator.vibrate&&navigator.vibrate(30)}catch(e){}setTimeout(()=>location.href='chuches.html',520)}else setTimeout(()=>{if(f.style.animation===anim)f.style.animation=''},520)})}
 /* ---------- teclado del móvil: mantener la cabecera visible ---------- */
 if(window.visualViewport){const vv=window.visualViewport;
   const fix=()=>{const off=Math.max(0,vv.offsetTop);document.querySelectorAll('header,.kc-daily').forEach(e=>{e.style.transform=off?`translateY(${off}px)`:''})};
