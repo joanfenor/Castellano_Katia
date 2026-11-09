@@ -123,26 +123,51 @@ const MUS={on:false,timer:0,step:0,next:0,bpm:118,master:null,mode:'play'};
 const ICON_ON='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
 const ICON_OFF='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
 const SONG={
-  lead:[72,76,79,76,77,76,74,72, 69,72,76,72,74,72,71,69, 65,69,72,77,76,74,72,69, 67,71,74,79,77,74,71,67,
-        72,76,79,84,83,79,76,72, 69,72,76,81,79,76,72,69, 65,69,72,77,81,77,72,69, 74,-1,79,-1,77,76,74,71],
-  bass:[48,45,41,43,48,45,41,43]};
+  A:{lead:[72,76,79,76,77,76,74,72, 69,72,76,72,74,72,71,69, 65,69,72,77,76,74,72,69, 67,71,74,79,77,74,71,67,
+          72,76,79,84,83,79,76,72, 69,72,76,81,79,76,72,69, 65,69,72,77,81,77,72,69, 74,-1,79,-1,77,76,74,71],
+     ch:[[48,0],[45,1],[41,0],[43,0],[48,0],[45,1],[41,0],[43,0]]},
+  B:{lead:[77,-1,76,77,79,77,76,74, 74,-1,72,74,76,74,72,71, 71,72,74,76,79,76,74,72, 72,-1,71,69,72,76,81,-1,
+          81,79,77,76,77,79,81,77, 79,77,76,74,76,77,79,74, 76,74,72,74,76,79,84,-1, 79,-1,74,-1,71,-1,67,-1],
+     ch:[[41,0],[43,0],[40,1],[45,1],[41,0],[43,0],[48,0],[43,0]]}};
+const ORDER=['A','A','B','A'];
 const mtof=m=>440*Math.pow(2,(m-69)/12);
+const minor=m=>[4,9,11].includes(((m%12)+12)%12)?m-1:m;   /* do mayor → do menor cuando falta salud */
 function ac(){AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC}
-function note(type,f,t,d,vol,dest){const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+function note(type,f,t,d,vol,dest,vib){const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+  if(vib){const l=AC.createOscillator(),lg=AC.createGain();l.frequency.value=6;lg.gain.value=f*.012;l.connect(lg);lg.connect(o.frequency);l.start(t);l.stop(t+d+.05)}
   g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(dest);o.start(t);o.stop(t+d+.05);return o}
 let NOISE=null;
-function hat(t,vol,dest){if(!NOISE){NOISE=AC.createBuffer(1,AC.sampleRate*.1,AC.sampleRate);const d=NOISE.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
-  const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=NOISE;f.type='highpass';f.frequency.value=7000;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+.05);s.connect(f);f.connect(g);g.connect(dest);s.start(t);s.stop(t+.06)}
-function kick(t,dest){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(45,t+.12);g.gain.setValueAtTime(.35,t);g.gain.exponentialRampToValueAtTime(.0001,t+.18);o.connect(g);g.connect(dest);o.start(t);o.stop(t+.2)}
-function schedule(){const e=.5*60/MUS.bpm;while(MUS.next<AC.currentTime+.15){const i=MUS.step%64,t=MUS.next,bar=Math.floor(i/8)%8,b=i%8;
-    const m=SONG.lead[i];if(m>0){note('square',mtof(m),t,e*.85,.045,MUS.master);note('triangle',mtof(m+12),t,e*.5,.02,MUS.master)}
-    const root=SONG.bass[bar];note('triangle',mtof(b%4===2?root+7:root),t,e*.9,.12,MUS.master);
-    if(b%4===0)kick(t,MUS.master);if(b%2===1)hat(t,.06,MUS.master);
-    if(b===0&&MUS.step>0){const btn=$('snd');btn.classList.remove('beat');void btn.offsetWidth;btn.classList.add('beat')}
+function noise(t,vol,dest,type,freq,dur){if(!NOISE){NOISE=AC.createBuffer(1,AC.sampleRate*.3,AC.sampleRate);const d=NOISE.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+  const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=NOISE;f.type=type;f.frequency.value=freq;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(dest);s.start(t);s.stop(t+dur+.02)}
+const hat=(t,v,d)=>noise(t,v,d,'highpass',7000,.05), snare=(t,v,d)=>{noise(t,v,d,'bandpass',1800,.14);note('triangle',190,t,.08,v*.6,d)}, clap=(t,d)=>{noise(t,.12,d,'bandpass',1200,.03);noise(t+.012,.12,d,'bandpass',1200,.03);noise(t+.024,.14,d,'bandpass',1200,.09)};
+function kick(t,dest,v=.35,f0=150){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(45,t+.12);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+.18);o.connect(g);g.connect(dest);o.start(t);o.stop(t+.2)}
+function mood(){const h=G?G.health:50;return {h,danger:G&&!G.over&&h<30,high:G&&!G.over&&h>=75,combo:G?mult():1}}
+function schedule(){const e=.5*60/MUS.bpm;
+  while(MUS.next<AC.currentTime+.15){const t=MUS.next,step=MUS.step,i=step%64,sec=ORDER[Math.floor(step/64)%ORDER.length],S=SONG[sec],bar=Math.floor(i/8),b=i%8,M=mood();
+    const tr=m=>M.danger?minor(m):m,dest=MUS.master;
+    /* filtro: con poca salud la música suena apagada, como bajo el agua */
+    if(b===0){const fq=M.danger?500+M.h*45:M.h<50?3500+M.h*120:16000;MUS.filter.frequency.setTargetAtTime(fq,t,.25)}
+    const [root,isMin]=S.ch[bar],third=isMin?3:4;
+    const m=S.lead[i];
+    if(m>0){note(M.danger?'sawtooth':'square',mtof(tr(m)),t,e*.85,M.danger?.03:.045,dest,M.danger);note('triangle',mtof(tr(m+12)),t,e*.5,.02,dest);
+      if(M.high&&b%2===0)note('sine',mtof(tr(m+24)),t,e*2.2,.03,dest)}
+    /* bajo: raíz y quinta, más saltarín cuando vas bien */
+    const bn=b%4===2?root+7:(M.high&&b%2===1?root+12:root);if(!(M.danger&&b%2===1))note('triangle',mtof(tr(bn)),t,e*.9,.12,dest);
+    /* arpegio en semicorcheas con el acorde */
+    const tri=[0,third,7,12];for(const [k,dt] of [[b*2%4,0],[(b*2+1)%4,e/2]]){if(M.danger&&dt)continue;note('sine',mtof(tr(root+24+tri[[0,1,2,1][k]])),t+dt,e*.45,M.high?.035:.022,dest)}
+    /* batería */
+    if(M.danger){if(b===0||b===4){kick(t,dest,.4,90);kick(t+e*.55,dest,.25,80)}}   /* latido de corazón */
+    else{if(b===0||b===4||(b===7&&M.high))kick(t,dest);if(b===2||b===6)snare(t,.12,dest);if(b%2===1)hat(t,.05,dest);if(M.high)hat(t+e/2,.035,dest);if(M.combo>1&&(b===2||b===6))clap(t,dest)}
+    /* redoble al final de cada parte */
+    if(i>=60&&!M.danger)for(let k=0;k<2;k++)snare(t+k*e/2,.07+(i-60)*.02,dest);
+    /* alarma suave cuando queda poca salud */
+    if(M.danger&&b===0&&bar%2===0){note('square',mtof(84),t,.12,.02,dest);note('square',mtof(83),t+.16,.12,.02,dest)}
+    if(b===0&&step>0){const btn=$('snd');btn.classList.remove('beat');void btn.offsetWidth;btn.classList.add('beat')}
     MUS.next+=e;MUS.step++}}
-function musicStart(){if(!KC.get('sound',true)||MUS.on)return;try{ac();MUS.master=AC.createGain();MUS.master.gain.value=.8;MUS.master.connect(AC.destination);
+function musicStart(){if(!KC.get('sound',true)||MUS.on)return;try{ac();MUS.master=AC.createGain();MUS.master.gain.value=.8;MUS.filter=AC.createBiquadFilter();MUS.filter.type='lowpass';MUS.filter.frequency.value=16000;MUS.filter.Q.value=4;
+  MUS.master.connect(MUS.filter);MUS.filter.connect(AC.destination);
   MUS.on=true;MUS.step=0;MUS.next=AC.currentTime+.08;schedule();MUS.timer=setInterval(schedule,40)}catch(e){}}
-function musicStop(fade){if(!MUS.on)return;MUS.on=false;clearInterval(MUS.timer);const g=MUS.master;try{g.gain.setTargetAtTime(.0001,AC.currentTime,fade?.4:.03);setTimeout(()=>g.disconnect(),fade?1600:200)}catch(e){}}
+function musicStop(fade){if(!MUS.on)return;MUS.on=false;clearInterval(MUS.timer);const g=MUS.master,fl=MUS.filter;try{g.gain.setTargetAtTime(.0001,AC.currentTime,fade?.4:.03);setTimeout(()=>{try{g.disconnect();fl&&fl.disconnect()}catch(e){}},fade?1600:200)}catch(e){}}
 function musicTempo(){MUS.bpm=Math.min(165,118+(G?G.phase-1:0)*8)}
 function sadJingle(){if(!KC.get('sound',true))return;try{ac();const t=AC.currentTime+.1;[[67,.0],[66,.35],[65,.7],[64,1.05]].forEach(([m,o],i)=>note('square',mtof(m),t+o,i===3?1.1:.32,.06,AC.destination));
   [[43,0],[42,.35],[41,.7],[40,1.05]].forEach(([m,o],i)=>note('triangle',mtof(m),t+o,i===3?1.1:.32,.14,AC.destination))}catch(e){}}
