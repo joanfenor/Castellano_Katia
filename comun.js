@@ -172,7 +172,8 @@ addEventListener('load',hdrH);addEventListener('resize',hdrH);
 
 function gift(pts){const PER=150,L=Math.floor(pts/PER),left=PER-(pts-L*PER);
   const g=lang()==='uk'?{1:'соняшник у волоссі',3:'віночок',6:'блискучі зірочки'}:{1:'un girasol en el pelo',3:'una corona de flores',6:'estrellas brillantes'};
-  const x=g[L+1]||'';const n10=left%10,n100=left%100,w=n10===1&&n100!==11?'бала':'балів';return lang()==='uk'?`До наступного рівня бракує ${left} ${w}${x?': '+x:''}.`:`Te faltan ${left} puntos para el siguiente nivel${x?': '+x:''}.`}
+  const x=g[L+1]||'';if(lang()==='uk'){const n10=left%10,n100=left%100,w=n10===1&&n100!==11?'бал':(n10>=2&&n10<=4&&(n100<12||n100>14)?'бали':'балів');return `Ще ${left} ${w} до рівня ${L+2}${x?': '+x:''}.`}
+  return `Faltan ${left} puntos para el nivel ${L+2}${x?': '+x:''}.`}
 function paintGift(pts){const el=document.getElementById('nextGift');if(el)el.textContent=gift(pts)}
 
 
@@ -189,6 +190,14 @@ function mountFlag(){
   paint();
 }
 
+/* ---------- teclado del móvil: mantener la cabecera visible ---------- */
+if(window.visualViewport){const vv=window.visualViewport;
+  const fix=()=>{const off=Math.max(0,vv.offsetTop);document.querySelectorAll('header,.kc-daily').forEach(e=>{e.style.transform=off?`translateY(${off}px)`:''})};
+  vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);}
+document.addEventListener('focusin',e=>{const el=e.target;if(!el.matches||!el.matches('input:not([type=checkbox]):not([type=file]),textarea'))return;
+  setTimeout(()=>{const cs=getComputedStyle(document.documentElement);const top=(parseFloat(cs.getPropertyValue('--hdrh'))||130)+(parseFloat(cs.getPropertyValue('--kcd'))||0)+14;
+    const vt=window.visualViewport?visualViewport.offsetTop:0;const r=el.getBoundingClientRect();const y=r.top-vt;
+    const vh=window.visualViewport?visualViewport.height:innerHeight;if(y<top||y+r.height>vh-10)window.scrollBy({top:y-top,behavior:'smooth'})},380)});
 window.KC={gift,paintGift,get,set,L,lang,today,GOAL,days,todayCount,streak,hit,badges,checkBadges,stats,toast,
   dailyStart,dailyActive,dailyBar,dailyTick,daily,canSpeak,say,canListen:!!SR,listen,report,backup,restore,extra,loadExtra,parseCSV};
 loadExtra();
