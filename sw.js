@@ -1,5 +1,5 @@
 // Cambia VERSION cada vez que subas archivos nuevos para que el móvil los actualice.
-const VERSION='v13';
+const VERSION='v15';
 const CACHE='katia-'+VERSION;
 const FILES=['./','index.html','verbos.html','vocabulario.html','gramatica.html','comun.js','config.js','manifest.webmanifest','icon-192.png','icon-512.png','icon-maskable-512.png','apple-touch-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});

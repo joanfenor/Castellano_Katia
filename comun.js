@@ -17,7 +17,7 @@ st.textContent=`.kc-toast{position:fixed;left:50%;bottom:calc(18px + env(safe-ar
  background:#0b2a66;color:#fff;border:3px solid #ffd700;border-radius:16px;padding:12px 18px;font:600 16px Figtree,system-ui,sans-serif;
  box-shadow:0 12px 30px rgba(0,0,0,.3);max-width:min(92vw,420px);text-align:center;transition:opacity .4s,transform .4s}
 .kc-toast.out{opacity:0;transform:translate(-50%,20px)}
-.kc-daily{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:#0b2a66;color:#fff;font:600 15px Figtree,system-ui,sans-serif;
+.kc-daily{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);z-index:30;background:#0b2a66;color:#fff;font:600 15px Figtree,system-ui,sans-serif;
  padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));display:flex;gap:12px;align-items:center;justify-content:space-between}
 .kc-daily .kb{flex:1;height:8px;border-radius:9px;background:rgba(255,255,255,.25);overflow:hidden;max-width:260px}
 .kc-daily .kb i{display:block;height:100%;background:#ffd700}
@@ -159,12 +159,13 @@ const ICON_ON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const ICON_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 5 6M21 9l-5 6"/></svg>';
 function mountSound(){
   if(document.querySelector('.kc-snd'))return;const side=document.querySelector('.hdrbtns');const b=document.createElement('button');b.className='kc-snd';
-  if(side){side.appendChild(b)}else{const lg=document.querySelector('header .lang');if(!lg)return;const box=document.createElement('div');box.className='kc-hdr';lg.parentNode.insertBefore(box,lg);box.appendChild(b);box.appendChild(lg)}
+  if(side){const f=side.querySelector('.kc-flag');side.insertBefore(b,f?f.nextSibling:side.firstChild)}else{const lg=document.querySelector('header .lang');if(!lg)return;const box=document.createElement('div');box.className='kc-hdr';lg.parentNode.insertBefore(box,lg);box.appendChild(b);box.appendChild(lg)}
   const paint=()=>{const on=get('sound',true);b.setAttribute('aria-pressed',on);b.innerHTML=on?ICON_ON:ICON_OFF;b.setAttribute('aria-label',on?L('Sonido activado','Звук увімкнено'):L('Sonido desactivado','Звук вимкнено'))};
   b.onclick=()=>{const on=!get('sound',true);set('sound',on);paint();dispatchEvent(new CustomEvent('kc-sound',{detail:on}))};
   paint();
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mountSound);else mountSound();
+function mountHdr(){mountFlag();mountSound();hdrH();const h=document.querySelector('header');if(h&&window.ResizeObserver)new ResizeObserver(hdrH).observe(h)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mountHdr);else mountHdr();
 function hdrH(){const h=document.querySelector('header');if(h)document.documentElement.style.setProperty('--hdrh',h.offsetHeight+'px');const b=document.querySelector('.kc-daily');if(b)document.documentElement.style.setProperty('--kcd',b.offsetHeight+'px')}
 addEventListener('load',hdrH);addEventListener('resize',hdrH);
 
@@ -173,6 +174,20 @@ function gift(pts){const PER=150,L=Math.floor(pts/PER),left=PER-(pts-L*PER);
   const g=lang()==='uk'?{1:'соняшник у волоссі',3:'віночок',6:'блискучі зірочки'}:{1:'un girasol en el pelo',3:'una corona de flores',6:'estrellas brillantes'};
   const x=g[L+1]||'';const n10=left%10,n100=left%100,w=n10===1&&n100!==11?'бала':'балів';return lang()==='uk'?`До наступного рівня бракує ${left} ${w}${x?': '+x:''}.`:`Te faltan ${left} puntos para el siguiente nivel${x?': '+x:''}.`}
 function paintGift(pts){const el=document.getElementById('nextGift');if(el)el.textContent=gift(pts)}
+
+
+/* ---------- idioma con bandera ---------- */
+const FLAG_ES='<svg viewBox="0 0 30 30" aria-hidden="true"><rect width="30" height="30" fill="#c60b1e"/><rect y="7.5" width="30" height="15" fill="#ffc400"/></svg>';
+const FLAG_UK='<svg viewBox="0 0 30 30" aria-hidden="true"><rect width="30" height="15" fill="#0057b7"/><rect y="15" width="30" height="15" fill="#ffd700"/></svg>';
+function mountFlag(){
+  const side=document.querySelector('.hdrbtns');if(!side||document.querySelector('.kc-flag'))return;
+  const es=document.getElementById('langEs'),uk=document.getElementById('langUk');if(!es||!uk)return;
+  const b=document.createElement('button');b.className='kc-flag';side.prepend(b);
+  const paint=()=>{const l=lang();b.innerHTML=l==='uk'?FLAG_UK:FLAG_ES;
+    b.setAttribute('aria-label',l==='uk'?'Мова: українська. Змінити на іспанську':'Idioma: español. Cambiar a ucraniano');b.title=b.getAttribute('aria-label')};
+  b.onclick=()=>{(lang()==='uk'?es:uk).click();setTimeout(paint,0)};
+  paint();
+}
 
 window.KC={gift,paintGift,get,set,L,lang,today,GOAL,days,todayCount,streak,hit,badges,checkBadges,stats,toast,
   dailyStart,dailyActive,dailyBar,dailyTick,daily,canSpeak,say,canListen:!!SR,listen,report,backup,restore,extra,loadExtra,parseCSV};
