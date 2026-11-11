@@ -86,11 +86,23 @@ function checkBadges(){const s=stats(),have=get('badges',[]);let changed=false;
   for(const [id,es,uk,f] of BADGES)if(!have.includes(id)&&f(s)){have.push(id);changed=true;toast(L('¡Nuevo logro! ','Нове досягнення! ')+'<b>'+L(es,uk)+'</b>')}
   if(changed)set('badges',have)}
 
+/* ---------- navegación: el botón «atrás» del móvil no recorre todo el historial ---------- */
+const isHome=()=>/\/(index\.html)?$/.test(location.pathname);
+function go(url){
+  const toHome=/^(\.\/|index\.html)(\?.*)?$/.test(url);
+  if(isHome()){try{sessionStorage.setItem('kc-fromhome','1')}catch(e){}location.href=url;return}
+  if(toHome){if(/hecho=1/.test(url))try{sessionStorage.setItem('kc-hecho','1')}catch(e){}
+    let fh=false;try{fh=sessionStorage.getItem('kc-fromhome')==='1'}catch(e){}
+    if(fh&&history.length>1){history.back();setTimeout(()=>location.replace('./'),800);return}
+    location.replace('./');return}
+  location.replace(url)}
+document.addEventListener('click',e=>{if(e.defaultPrevented||e.button>0||e.metaKey||e.ctrlKey)return;const a=e.target.closest&&e.target.closest('a[href]');if(!a||a.target||a.hasAttribute('download'))return;
+  const h=a.getAttribute('href');if(!h||/^(https?:|mailto:|tel:|sms:|#|blob:|data:|javascript:)/i.test(h))return;e.preventDefault();go(h)});
 /* ---------- repaso de hoy ---------- */
 const DN=10;
 function daily(){try{return JSON.parse(sessionStorage.getItem('katia-daily'))}catch(e){return null}}
 function setDaily(v){try{v?sessionStorage.setItem('katia-daily',JSON.stringify(v)):sessionStorage.removeItem('katia-daily')}catch(e){}}
-function dailyStart(){setDaily({phase:'verbos',left:DN});location.href='verbos.html?hoy=1'}
+function dailyStart(){setDaily({phase:'verbos',left:DN});go('verbos.html?hoy=1')}
 function dailyActive(phase){const d=daily();return !!(d&&d.phase===phase&&/[?&]hoy=1/.test(location.search))}
 function dailyBar(phase){
   if(!dailyActive(phase))return;const d=daily();
@@ -103,8 +115,8 @@ function dailyBar(phase){
 function dailyTick(phase){
   if(!dailyActive(phase))return false;const d=daily();d.left--;
   if(d.left>0){setDaily(d);dailyBar(phase);return false}
-  if(phase==='verbos'){setDaily({phase:'vocab',left:DN});setTimeout(()=>location.href='vocabulario.html?hoy=1',1300)}
-  else{setDaily(null);set('dailydone',get('dailydone',0)+1);checkBadges();setTimeout(()=>location.href='./?hecho=1',1300);
+  if(phase==='verbos'){setDaily({phase:'vocab',left:DN});setTimeout(()=>go('vocabulario.html?hoy=1'),1300)}
+  else{setDaily(null);set('dailydone',get('dailydone',0)+1);checkBadges();setTimeout(()=>go('./?hecho=1'),1300);
     const bar=document.querySelector('.kc-daily');if(bar)bar.innerHTML=`<span>${L('¡Repaso de hoy completado! 🌻','Повторення дня виконано! 🌻')}</span>`;return true}
   dailyBar(phase);return true;
 }
@@ -200,7 +212,7 @@ function mountFlag(){
       cd.style.left=(r.left+r.width/2)+'px';cd.style.top=(r.bottom+10)+'px';cd.innerHTML='<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="26" class="bg"/><circle cx="30" cy="30" r="26" class="fg"/></svg><b>3</b><span>🌻</span>';
       document.body.appendChild(cd);let n=3;try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}
       iv=setInterval(()=>{n--;if(!cd)return;if(n>0){const e=cd.querySelector('b');e.textContent=n;e.style.animation='none';void e.offsetWidth;e.style.animation='';try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}}
-        else{clearInterval(iv);longDone=true;cd.classList.add('go');try{navigator.vibrate&&navigator.vibrate(40)}catch(e){}setTimeout(()=>location.href='jardin.html',350)}},600)},350)});
+        else{clearInterval(iv);longDone=true;cd.classList.add('go');try{navigator.vibrate&&navigator.vibrate(40)}catch(e){}setTimeout(()=>go('jardin.html'),350)}},600)},350)});
   ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>{if(!longDone)stopCd();else clearTimeout(lp)}));
   b.addEventListener('contextmenu',e=>e.preventDefault());
   b.onclick=()=>{if(longDone||started){longDone=false;started=false;return}(lang()==='uk'?es:uk).click();setTimeout(paint,0)};
@@ -230,7 +242,7 @@ function eggCss(){if(document.getElementById('kc-egg-css'))return;const st=docum
 function mountFaceTaps(){const f=document.getElementById('face');if(!f||f.dataset.taps)return;f.dataset.taps=1;f.style.cursor='pointer';eggCss();
   let n=0,t0=0;f.addEventListener('click',()=>{const now=Date.now();if(now-t0>2500)n=0;if(!n)t0=now;n++;
     const anim=n>=3?'kcSpinOut .55s ease forwards':n===2?'kcWiggle .5s ease':'kcJump .5s ease';f.style.animation='none';void f.offsetWidth;f.style.animation=anim;
-    if(n>=3){n=0;try{navigator.vibrate&&navigator.vibrate(30)}catch(e){}setTimeout(()=>location.href='chuches.html',520)}else setTimeout(()=>{if(f.style.animation===anim)f.style.animation=''},520)})}
+    if(n>=3){n=0;try{navigator.vibrate&&navigator.vibrate(30)}catch(e){}setTimeout(()=>go('chuches.html'),520)}else setTimeout(()=>{if(f.style.animation===anim)f.style.animation=''},520)})}
 /* ---------- teclado del móvil: mantener la cabecera visible ---------- */
 if(window.visualViewport){const vv=window.visualViewport;
   const fix=()=>{const off=Math.max(0,vv.offsetTop);document.querySelectorAll('header,.kc-daily').forEach(e=>{e.style.transform=off?`translateY(${off}px)`:''})};
@@ -239,7 +251,7 @@ document.addEventListener('focusin',e=>{const el=e.target;if(!el.matches||!el.ma
   setTimeout(()=>{const cs=getComputedStyle(document.documentElement);const top=(parseFloat(cs.getPropertyValue('--hdrh'))||130)+(parseFloat(cs.getPropertyValue('--kcd'))||0)+14;
     const vt=window.visualViewport?visualViewport.offsetTop:0;const r=el.getBoundingClientRect();const y=r.top-vt;
     const vh=window.visualViewport?visualViewport.height:innerHeight;if(y<top||y+r.height>vh-10)window.scrollBy({top:y-top,behavior:'smooth'})},380)});
-window.KC={gift,paintGift,get,set,L,lang,today,GOAL,days,todayCount,streak,hit,badges,checkBadges,stats,toast,
+window.KC={go,gift,paintGift,get,set,L,lang,today,GOAL,days,todayCount,streak,hit,badges,checkBadges,stats,toast,
   dailyStart,dailyActive,dailyBar,dailyTick,daily,canSpeak,say,canListen:!!SR,listen,report,backup,restore,extra,loadExtra,parseCSV};
 loadExtra();
 })();

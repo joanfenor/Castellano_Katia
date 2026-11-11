@@ -206,11 +206,12 @@ function fence(){const y0=MT;ctx.save();
   for(let x=10;x<W;x+=46){const g=ctx.createLinearGradient(x,0,x+8,0);g.addColorStop(0,'#7a4c22');g.addColorStop(.45,'#c99a62');g.addColorStop(1,'#6a3f1c');ctx.fillStyle=g;ctx.fillRect(x,y0-34,8,36);
     ctx.fillStyle='#5e3818';ctx.beginPath();ctx.moveTo(x-1,y0-34);ctx.lineTo(x+4,y0-40);ctx.lineTo(x+9,y0-34);ctx.fill();ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(x+2,y0-32,1.5,30)}
   ctx.restore()}
-function sign(t){if(nBlack()>0||!sheep.length)return;const x=W*.22,y=MT+52;ctx.save();ctx.translate(x,y);ctx.rotate(Math.sin(t*1.2)*.02);
-  const g=ctx.createLinearGradient(-4,0,4,0);g.addColorStop(0,'#7a4c22');g.addColorStop(1,'#a8743c');ctx.fillStyle=g;ctx.fillRect(-4,-40,8,44);
-  const b=ctx.createLinearGradient(0,-78,0,-40);b.addColorStop(0,'#d9a866');b.addColorStop(1,'#a8743c');ctx.fillStyle=b;ctx.beginPath();ctx.roundRect(-82,-80,164,42,8);ctx.fill();
-  ctx.strokeStyle='rgba(90,50,20,.35)';ctx.lineWidth=1;for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(-78,-70+i*12);ctx.lineTo(78,-68+i*12);ctx.stroke()}
-  ctx.fillStyle='#3d2210';ctx.font='800 14px Figtree,system-ui';ctx.textAlign='center';ctx.fillText(L('¡Ni una oveja negra! 🌻','Жодної чорної вівці! 🌻'),0,-54);ctx.restore()}
+function sign(t){if(nBlack()>0||!sheep.length)return;ctx.save();ctx.font='800 14px Figtree,system-ui';const txt=L('¡Ni una oveja negra! 🌻','Жодної чорної вівці! 🌻');const w=ctx.measureText(txt).width+28,h=30,x=W/2,y=MT-36;
+  ctx.translate(x,y);ctx.rotate(Math.sin(t*1.2)*.015);
+  ctx.shadowColor='rgba(40,20,5,.35)';ctx.shadowBlur=6;ctx.shadowOffsetY=3;const b=ctx.createLinearGradient(0,6,0,6+h);b.addColorStop(0,'#e2b475');b.addColorStop(1,'#a8743c');ctx.fillStyle=b;ctx.beginPath();ctx.roundRect(-w/2,6,w,h,6);ctx.fill();ctx.shadowColor='transparent';
+  ctx.strokeStyle='rgba(90,50,20,.3)';ctx.lineWidth=1;for(let k=0;k<2;k++){ctx.beginPath();ctx.moveTo(-w/2+6,14+k*10);ctx.lineTo(w/2-6,15+k*10);ctx.stroke()}
+  ctx.fillStyle='#4a2a10';for(const nx of[-w*.25,w*.25]){ctx.beginPath();ctx.arc(nx,11,2,0,7);ctx.fill()}
+  ctx.fillStyle='#3d2210';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,0,6+h/2+1);ctx.restore()}
 /* ===== datos reales ===== */
 const L=(es,uk)=>KC.lang()==='uk'?uk:es;
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -230,7 +231,7 @@ const OPT={dog:true,quiz:true};
 
 /* ===== escena ===== */
 let MT=0,F=[],D=[],clouds=[],grass=null,HOR=0,sparks=[],sel=null;
-function mkSheep(o,r){const d=Math.pow(r(),.9);return {w:o.w,black:o.st==='black',crown:o.st==='crown',k:o.st==='black'?0:1,x:30+r()*(W-60),y:MT+30+d*(H-74-MT-30),sc:.7+d*.42,dir:r()<.5?-1:1,state:'graze',timer:1+r()*4,tx:0,ph:r()*6,gz:0,hop:0,vy:0,bleat:0,sad:0,kind:'sheep'}}
+function mkSheep(o,r){const d=Math.pow(r(),.9);return {w:o.w,black:o.st==='black',crown:o.st==='crown',k:o.st==='black'?0:1,x:30+r()*(W-60),y:MT+30+d*(H-74-MT-30),sc:.58+d*.34,dir:r()<.5?-1:1,state:'graze',timer:1+r()*4,tx:0,ph:r()*6,gz:0,hop:0,vy:0,bleat:0,sad:0,kind:'sheep'}}
 const dayKeys=()=>Object.keys(DAYS).filter(k=>DAYS[k]>0).sort().slice(-150);
 function mkDay(k){const n=DAYS[k],b=n>=KC.GOAL?5:n>=10?3:1;return mkFlower({w:k,day:k,n,b},HOR+10,MT-8)}
 function mkFlower(o,top,bot){const r=rnd(hash(o.w));const d=Math.pow(r(),.8);const y=top+d*(bot-top),sc=.35+d*.75;
@@ -326,7 +327,7 @@ const nBlack=()=>sheep.filter(s=>s.black).length;
 function counts(){const st=WORDS.map(x=>stateOf(x.w)),bl=st.filter(x=>x==='black').length,cr=st.filter(x=>x==='crown').length,wh=st.filter(x=>x==='white').length;
   $('count').innerHTML=`<span>🌻 ${F.length} ${L(F.length===1?'día':'días','днів')}</span><span>👑 ${cr}</span><span>⚪ ${wh}</span><span class="nb">⚫ ${bl}</span>`;
   $('practice').hidden=!bl;$('practice').textContent=L(`🐑 Practicar mis ${bl} ovejas negras`,`🐑 Повторити ${bl} чорних овець`)}
-$('practice').onclick=()=>{try{localStorage.setItem('kvoc-topic',JSON.stringify('hard'))}catch(e){}location.href='vocabulario.html'};
+$('practice').onclick=()=>{try{localStorage.setItem('kvoc-topic',JSON.stringify('hard'))}catch(e){}KC.go('vocabulario.html')};
 function texts(){document.documentElement.lang=KC.lang();document.title=L('Jardín de girasoles','Сад соняшників');$('h1').textContent=L('Tu jardín','Твій сад');
   $('legend').innerHTML=L('🌻 cada día que practicas · 🐑 cada palabra: ⚫ difícil, ⚪ aprendiendo, 👑 dominada','🌻 кожен день практики · 🐑 кожне слово: ⚫ складне, ⚪ вивчаєш, 👑 вивчене');
   $('eH').textContent=L('Tu jardín está esperando','Твій сад чекає');
