@@ -46,7 +46,7 @@
 <title>El español de Katia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=Caveat:wght@700&display=swap">
 <style>
 /* Layout: azulejo-patterned header band, then two tabs — "Conjugar" (verb chips + tense tables) and "Practicar" (exercise card + settings). */
 :root{
@@ -515,7 +515,7 @@ body{padding-top:calc(var(--hdrh,130px) + var(--kcd,0px))}
   </div>
 </div>
 <div class="splash" id="splash" role="dialog" aria-label="Bienvenida">
-  <div class="sp-sheen" aria-hidden="true"></div><div class="sp-choc" id="spChoc" aria-hidden="true" hidden><svg viewBox="0 0 64 56"><defs><linearGradient id="chA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a8683c"/><stop offset=".55" stop-color="#6e3a1a"/><stop offset="1" stop-color="#4a230c"/></linearGradient><linearGradient id="chF" x1="0" x2="1"><stop offset="0" stop-color="#d8dde6"/><stop offset=".5" stop-color="#ffffff"/><stop offset="1" stop-color="#9aa3b2"/></linearGradient></defs><path d="M6 30 L40 4 L60 22 L58 40 L22 52 Z" fill="url(#chF)" opacity=".95"/><rect x="4" y="6" width="50" height="40" rx="5" fill="url(#chA)" transform="rotate(-8 29 26)"/><g transform="rotate(-8 29 26)"><rect x="8" y="10" width="19" height="15" rx="2.5" fill="#8a4a24"/><rect x="31" y="10" width="19" height="15" rx="2.5" fill="#8a4a24"/><rect x="8" y="28" width="19" height="15" rx="2.5" fill="#7a3f1e"/><rect x="31" y="28" width="19" height="15" rx="2.5" fill="#7a3f1e"/><path d="M10 12h15M33 12h15M10 30h15M33 30h15" stroke="rgba(255,255,255,.35)" stroke-width="1.6" stroke-linecap="round"/></g></svg></div><div class="sp-parts" id="spParts" aria-hidden="true"></div>
+  <div class="sp-sheen" aria-hidden="true"></div><div class="sp-parts" id="spParts" aria-hidden="true"></div>
   <div class="splash-card">
     <div class="medal" aria-hidden="true"><div class="medal-ring"><div class="splash-face" id="splashFace"></div><div class="gloss"></div></div><div class="medal-shadow"></div></div>
     <h2 id="splashHello">¡Hola, <em>Katia</em>!</h2>
@@ -599,6 +599,7 @@ body{padding-top:calc(var(--hdrh,130px) + var(--kcd,0px))}
 <footer class="wrap" data-i18n="foot">Tu progreso se guarda en este móvil y la app funciona sin conexión.</footer>
 <script src="config.js"></script>
 <script src="comun.js"></script>
+<script src="entrada.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const ukN=(n,a,b,c)=>{const m10=n%10,m100=n%100;return m10===1&&m100!==11?a:(m10>=2&&m10<=4&&(m100<12||m100>14)?b:c)};
@@ -745,21 +746,7 @@ $('bkFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{KC.res
   $('splashMsg').innerHTML=t('intro');$('splashSkip').textContent=t('skip');
   let gone=false;const close=()=>{if(gone)return;gone=true;sp.classList.add('out');setTimeout(()=>sp.hidden=true,700)};
   sp.addEventListener('click',close);document.addEventListener('keydown',close,{once:true});
-  /* mientras espera: pasa un trozo de chocolate, Katia lo sigue con la mirada… y se le cae la baba */
-  if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
-    const svg=$('splashFace').querySelector('svg'),eyes=svg&&svg.querySelector('.eyes');let look=null,drool=null;
-    if(eyes){look=document.createElementNS('http://www.w3.org/2000/svg','g');eyes.parentNode.insertBefore(look,eyes);look.appendChild(eyes);
-      drool=document.createElementNS('http://www.w3.org/2000/svg','g');drool.setAttribute('class','drool');
-      drool.innerHTML='<path d="M70.5 79 Q76 87.5 72.6 91.8 Q70.6 93.8 68.4 91.8 Q65.6 87.8 70.5 79Z" fill="#c9ecff" stroke="#4f9fd8" stroke-width="1"/><ellipse cx="69.4" cy="88.6" rx="1" ry="2" fill="#fff"/>';svg.appendChild(drool)}
-    const ch=$('spChoc');let lx=0,ly=0;
-    const pass=()=>{if(gone||sp.hidden)return;const fr=$('splashFace').getBoundingClientRect(),fx=fr.left+fr.width/2,fy=fr.top+fr.height/2,W2=innerWidth,dir=Math.random()<.5?1:-1,dur=3600,t0=performance.now();let drooled=false;ch.hidden=false;
-      const step=now=>{if(gone){ch.hidden=true;return}const k=Math.min(1,(now-t0)/dur),x=dir>0?-70+k*(W2+140):W2+70-k*(W2+140),y=fy-fr.height*.62+Math.sin(k*Math.PI*3)*12;
-        ch.style.transform=`translate(${x-35}px,${y-30}px) rotate(${Math.sin(k*9)*14}deg)`;
-        const tx=Math.max(-3.4,Math.min(3.4,(x-fx)/(W2/2)*3.4)),ty=Math.max(-2.4,Math.min(1.5,(y-fy)/120*2.4));lx+=(tx-lx)*.25;ly+=(ty-ly)*.25;look&&look.setAttribute('transform',`translate(${lx.toFixed(2)} ${ly.toFixed(2)})`);
-        if(!drooled&&Math.abs(x-fx)<50&&drool){drooled=true;drool.classList.remove('go');void drool.getBoundingClientRect();drool.classList.add('go')}
-        if(k<1)requestAnimationFrame(step);else{ch.hidden=true;const back=()=>{lx*=.8;ly*=.8;look&&look.setAttribute('transform',`translate(${lx.toFixed(2)} ${ly.toFixed(2)})`);if(Math.abs(lx)+Math.abs(ly)>.05&&!gone)requestAnimationFrame(back)};back();setTimeout(pass,3500+Math.random()*2500)}};
-      requestAnimationFrame(step)};
-    setTimeout(pass,4600)}
+  if(window.startEntrada)try{startEntrada({sp,isGone:()=>gone,lang,faceEl:$('splashFace')})}catch(e){console.error(e)}
 
   {const m=sp.querySelector('.medal'),c=sp.querySelector('.splash-card');if(m&&c){const y=c.getBoundingClientRect().top+m.offsetTop+m.offsetHeight/2;sp.style.setProperty('--mdy',Math.round(innerHeight/2-y)+'px')}}
 })();
