@@ -1,3 +1,6 @@
+/* móviles con navegador antiguo: dibujar rectángulos redondeados igualmente */
+if(window.CanvasRenderingContext2D&&!CanvasRenderingContext2D.prototype.roundRect){CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){let a=Array.isArray(r)?r:[r];a=a.length===1?[a[0],a[0],a[0],a[0]]:a.length===2?[a[0],a[1],a[0],a[1]]:a.length===3?[a[0],a[1],a[2],a[1]]:a;
+  const [tl,tr,br,bl]=a.map(v=>Math.max(0,Math.min(+v||0,Math.abs(w)/2,Math.abs(h)/2)));this.moveTo(x+tl,y);this.lineTo(x+w-tr,y);this.quadraticCurveTo(x+w,y,x+w,y+tr);this.lineTo(x+w,y+h-br);this.quadraticCurveTo(x+w,y+h,x+w-br,y+h);this.lineTo(x+bl,y+h);this.quadraticCurveTo(x,y+h,x,y+h-bl);this.lineTo(x,y+tl);this.quadraticCurveTo(x,y,x+tl,y);this.closePath();return this}}
 /* Funciones compartidas por todas las pantallas: objetivo diario, racha de días, logros,
    repaso de hoy, voz, avisos de traducción, copia de seguridad y contenido de la hoja. */
 (function(){

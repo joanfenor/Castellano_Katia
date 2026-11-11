@@ -35,6 +35,13 @@
 .backup{margin:22px 0 10px}.backup summary{font:400 22px var(--display);cursor:pointer}
 .backup .row{margin-top:10px}.filebtn{display:inline-flex;align-items:center;cursor:pointer}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cal i.some{background:#3d5f99}}
+.splash .sbtn{display:inline-block;margin-top:4px;font:800 18px var(--body);border:0;border-radius:16px;padding:13px 30px;color:#fff;cursor:pointer;
+  background:linear-gradient(180deg,#1a73d9,#0057b7);box-shadow:0 5px 0 #003d82,0 12px 24px rgba(0,60,140,.35)}
+.splash .sbtn:active{transform:translateY(3px);box-shadow:0 2px 0 #003d82}
+.splash p b{display:block;margin-top:10px;color:var(--ink);font-weight:800}
+#splashHello{font-size:clamp(34px,9.6vw,48px)!important}
+@media (prefers-reduced-motion:no-preference){.splash .sbtn{animation:fadeIn .8s ease 3.6s both,sPulse 1.6s ease-in-out 4.4s infinite}}
+@keyframes sPulse{50%{transform:scale(1.06)}}
 </style>
 <title>El español de Katia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -503,8 +510,7 @@ body{padding-top:calc(var(--hdrh,130px) + var(--kcd,0px))}
     <div class="medal" aria-hidden="true"><div class="medal-ring"><div class="splash-face" id="splashFace"></div><div class="gloss"></div></div><div class="medal-shadow"></div></div>
     <h2 id="splashHello">¡Hola, <em>Katia</em>!</h2>
     <p id="splashMsg">Poco a poco, el español ya es tuyo. ¡Ánimo!</p>
-    <div class="sbar"><i></i></div>
-    <small id="splashSkip">Toca para empezar</small>
+    <button class="sbtn" id="splashSkip">Empezar →</button>
   </div>
 </div>
 <header>
@@ -597,7 +603,7 @@ const I18N={
   bkSave:'Guardar copia',bkShare:'Enviar copia',bkLoad:'Recuperar desde archivo',bkSaved:'Copia guardada en Descargas.',bkOk:'¡Copia recuperada! Ya tienes tu progreso.',bkBad:'Ese archivo no es una copia de esta app.',bkNoShare:'Este móvil no permite enviar archivos desde aquí. Usa «Guardar copia».',
   foot:'Tu progreso se guarda en este móvil y la app funciona sin conexión.',level:'Nivel',ptsOf:(a,b)=>`${a}/${b} ★`,
   levels:['Principiante','Aprendiz','Exploradora','Viajera','Conversadora','Experta','Maestra','Leyenda del español'],
-  gift:(n,g)=>`Faltan ${n} puntos para el nivel ${L+2}${g?': '+g:''}.`,gifts:{1:'un girasol en el pelo',3:'una corona de flores',6:'estrellas brillantes'},skip:'Toca para empezar',
+  gift:(n,g)=>`Faltan ${n} puntos para el nivel ${L+2}${g?': '+g:''}.`,gifts:{1:'un girasol en el pelo',3:'una corona de flores',6:'estrellas brillantes'},skip:'Empezar →',intro:'Soy ucraniana. Mi hijo se llama Tomas y cuido a una niña que se llama Sonia.<b>¡Vamos a aprender castellano juntos!</b>',
   splash:['Cada día un poquito más. ¡Tú puedes!','Hoy vas a aprender algo nuevo. ¡Vamos allá!','Poco a poco, el español ya es tuyo. ¡Ánimo!','Equivocarse también es aprender. ¡A por ello!'],
   wd:['L','M','X','J','V','S','D']},
  uk:{title:'Іспанська для Каті',eyebrow:'Іспанська для Каті',hello:'Привіт,<br><em>Катю</em>!',sub:'Що сьогодні потренуємо?',
@@ -610,7 +616,7 @@ const I18N={
   bkSave:'Зберегти копію',bkShare:'Надіслати копію',bkLoad:'Відновити з файлу',bkSaved:'Копію збережено в «Завантаженнях».',bkOk:'Копію відновлено! Твій прогрес на місці.',bkBad:'Цей файл не є копією цього застосунку.',bkNoShare:'Цей телефон не дозволяє надсилати файли звідси. Скористайся «Зберегти копію».',
   foot:'Твій прогрес зберігається на цьому телефоні, і все працює без інтернету.',level:'Рівень',ptsOf:(a,b)=>`${a}/${b} ★`,
   levels:['Початківиця','Учениця','Дослідниця','Мандрівниця','Співрозмовниця','Експертка','Майстриня','Легенда іспанської'],
-  gift:(n,g)=>`Ще ${n} ${ukN(n,'бал','бали','балів')} до рівня ${L+2}${g?': '+g:''}.`,gifts:{1:'соняшник у волоссі',3:'віночок',6:'блискучі зірочки'},skip:'Торкнись, щоб почати',
+  gift:(n,g)=>`Ще ${n} ${ukN(n,'бал','бали','балів')} до рівня ${L+2}${g?': '+g:''}.`,gifts:{1:'соняшник у волоссі',3:'віночок',6:'блискучі зірочки'},skip:'Почати →',intro:'Я українка. Мого сина звати Томас, а ще я доглядаю дівчинку Соню.<b>Давай разом вивчати іспанську!</b>',
   splash:['Щодня трошки більше. У тебе все вийде!','Сьогодні ти вивчиш щось нове. Уперед!','Крок за кроком іспанська стає твоєю. Тримайся!','Помилятися — теж означає вчитися. Уперед!'],
   wd:['Пн','Вт','Ср','Чт','Пт','Сб','Нд']}
 };
@@ -721,14 +727,14 @@ $('bkFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{KC.res
   if(sessionStorage.getItem('katia-splash')){sp.hidden=true;return}
   try{sessionStorage.setItem('katia-splash','1')}catch(e){}
   $('splashFace').innerHTML=faceSVG(3,L);
-  const parts=lang==='uk'?[['Привіт, ',0],['Катю',1],['!',0]]:[['¡Hola, ',0],['Katia',1],['!',0]];let n=0;
+  const parts=lang==='uk'?[['Привіт, я ',0],['Катя',1],['!',0]]:[['¡Hola, soy ',0],['Katia',1],['!',0]];let n=0;
   $('splashHello').innerHTML=parts.map(([txt,em])=>{const h=[...txt].map(c=>`<span class="ch" style="animation-delay:${(2.1+n++*.07).toFixed(2)}s">${c}</span>`).join('');return em?`<em>${h}</em>`:h}).join('');
   const pk=['🌻','✦','🌻','★','✦','🌻'],box=$('spParts');
   for(let i=0;i<18;i++){const e=document.createElement('i');e.textContent=pk[i%pk.length];
     e.style.cssText=`left:${Math.random()*96}%;font-size:${14+Math.random()*22}px;color:${i%2?'#ffd700':'#fff'};animation-duration:${3.2+Math.random()*2.4}s;animation-delay:${.8+Math.random()*3}s;text-shadow:0 2px 6px rgba(0,30,80,.35)`;box.appendChild(e)}
-  const m=t('splash');$('splashMsg').textContent=m[Math.floor(Math.random()*m.length)];$('splashSkip').textContent=t('skip');
+  $('splashMsg').innerHTML=t('intro');$('splashSkip').textContent=t('skip');
   let gone=false;const close=()=>{if(gone)return;gone=true;sp.classList.add('out');setTimeout(()=>sp.hidden=true,700)};
-  sp.addEventListener('click',close);document.addEventListener('keydown',close,{once:true});setTimeout(close,5300);
+  sp.addEventListener('click',close);document.addEventListener('keydown',close,{once:true});
   {const m=sp.querySelector('.medal'),c=sp.querySelector('.splash-card');if(m&&c){const y=c.getBoundingClientRect().top+m.offsetTop+m.offsetHeight/2;sp.style.setProperty('--mdy',Math.round(innerHeight/2-y)+'px')}}
 })();
 

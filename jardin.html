@@ -248,9 +248,9 @@ function layout(){DPR=Math.min(2.5,devicePixelRatio||1);W=innerWidth;H=innerHeig
 /* lo que ha cambiado desde la última visita */
 let changedOnce=false;
 function changes(){if(changedOnce)return;changedOnce=true;const prev=demo?{}:KC.get('jardinseen',{}),now={};for(const x of WORDS)now[x.w]=x.st;
-  setTimeout(()=>{for(const sh of sheep){const p=prev[sh.w];if(!p)continue;
-    if(p==='black'&&!sh.black){sh.k=0;sh.anim={type:'rescue',t:0};sh.msg=2.4;sh.msgT=L('¡Ya es blanca! ✨','Уже біла! ✨');sh.vy=300}
-    else if(p!=='crown'&&sh.crown){sh.msg=2.4;sh.msgT=L('¡Dominada! 👑','Вивчено! 👑');sh.vy=300;burst(sh.x,sh.y-50,'#ffd23f',26)}}},900);
+  setTimeout(()=>{let nc=0;for(const sh of sheep){const p=prev[sh.w];if(!p||nc>=3)continue;
+    if(p==='black'&&!sh.black){sh.k=0;sh.anim={type:'rescue',t:0};sh.msg=2.4;sh.msgT=L('¡Ya es blanca! ✨','Уже біла! ✨');sh.vy=300;nc++}
+    else if(p!=='crown'&&sh.crown){sh.msg=2.4;sh.msgT=L('¡Dominada! 👑','Вивчено! 👑');sh.vy=300;burst(sh.x,sh.y-50,'#ffd23f',26);nc++}}},900);
   if(!demo)KC.set('jardinseen',now)}
 
 /* ===== comportamiento ===== */
@@ -277,13 +277,13 @@ function drawHerd(t){for(const h of herd){const s=h.sc*58;ctx.fillStyle='rgba(20
 function draw(t,dt){sky(t);hills(t);drawHerd(t);ctx.drawImage(grass,0,HOR-40,W,H-HOR+40);
   for(const d of D){const sw=RM?0:Math.sin(t*1.5+d.ph)*2;ctx.strokeStyle='#3d8a22';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(d.x+sw,d.y-d.sz*1.4);ctx.stroke();ctx.drawImage(DAISY[d.c],d.x+sw-d.sz/2,d.y-d.sz*1.4-d.sz/2,d.sz,d.sz)}
   const list=[...F,...sheep,{kind:'fence',y:MT}];if(dog.on)list.push({kind:'dog',y:dog.y});list.sort((a,b)=>a.y-b.y);
-  for(const o of list){if(o.kind==='fence'){fence();sign(t)}else if(o.kind==='sun')drawFlower(o,t);else if(o.kind==='dog')drawDog(t);else if(sel===o){ctx.save();ctx.shadowColor='rgba(255,230,120,.95)';ctx.shadowBlur=20;drawSheep(o,t);ctx.restore()}else drawSheep(o,t)}
+  for(const o of list){try{if(o.kind==='fence'){fence();sign(t)}else if(o.kind==='sun')drawFlower(o,t);else if(o.kind==='dog')drawDog(t);else if(sel===o){ctx.save();ctx.shadowColor='rgba(255,230,120,.95)';ctx.shadowBlur=20;drawSheep(o,t);ctx.restore()}else drawSheep(o,t)}catch(err){ctx.restore&&0}}
   for(const p of sparks){p.t+=dt;ctx.globalAlpha=Math.max(0,1-p.t);ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x+p.vx*p.t,p.y+p.vy*p.t+p.t*p.t*60,2.6,0,7);ctx.fill()}ctx.globalAlpha=1;sparks=sparks.filter(p=>p.t<1)}
 let last=0;
-function loop(now){const t=now/1000,dt=Math.min(.05,(now-last)/1000||0);last=now;
+function loop(now){requestAnimationFrame(loop);const t=now/1000,dt=Math.min(.05,(now-last)/1000||0);last=now;
   for(const sh of sheep)think(sh,dt);
   if(OPT.dog&&sheep.length){dog.next-=dt;if(!dog.on&&dog.next<=0){dog.on=true;dog.v=-dog.v;dog.x=dog.v>0?-60:W+60}if(dog.on){dog.x+=dog.v*dt;if(dog.x>W+80||dog.x<-80){dog.on=false;dog.next=12+Math.random()*8}}}
-  draw(t,dt);requestAnimationFrame(loop)}
+  try{draw(t,dt)}catch(err){console.error(err)}}
 
 /* ===== tocar ===== */
 /* arrastrar ovejas */
