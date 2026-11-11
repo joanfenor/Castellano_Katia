@@ -467,6 +467,10 @@ body{padding-top:calc(var(--hdrh,130px) + var(--kcd,0px))}
 .bmeter{height:8px;border-radius:9px;background:#f3e3f7;overflow:hidden;margin:0 auto 10px;max-width:220px}.bmeter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#9fd6ff,#d83a9a)}
 .bgift{font:400 30px var(--display);color:#e2a400;text-shadow:0 2px 0 #fff3c4;margin:2px 0 8px}
 @media (prefers-reduced-motion:reduce){.bday::before,.bcard,.cake .fl{animation:none}}
+
+.splash-face .eyes{transform-box:fill-box;transform-origin:50% 50%;animation:sBlink 3.4s ease-in-out infinite}
+@keyframes sBlink{0%,40%,46%,88%,100%{transform:scaleY(1)}43%,91%{transform:scaleY(.08)}}
+#splashHello{line-height:1.08}
 </style>
 </head>
 <body>
@@ -726,9 +730,9 @@ $('bkFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{KC.res
   const sp=$('splash');
   if(sessionStorage.getItem('katia-splash')){sp.hidden=true;return}
   try{sessionStorage.setItem('katia-splash','1')}catch(e){}
-  $('splashFace').innerHTML=faceSVG(3,L);
-  const parts=lang==='uk'?[['Привіт, я ',0],['Катя',1],['!',0]]:[['¡Hola, soy ',0],['Katia',1],['!',0]];let n=0;
-  $('splashHello').innerHTML=parts.map(([txt,em])=>{const h=[...txt].map(c=>`<span class="ch" style="animation-delay:${(2.1+n++*.07).toFixed(2)}s">${c}</span>`).join('');return em?`<em>${h}</em>`:h}).join('');
+  $('splashFace').innerHTML=faceSVG(2,L);
+  const parts=lang==='uk'?[['Привіт,',0],['\n',0],['я ',0],['Катя',1],['!',0]]:[['¡Hola,',0],['\n',0],['soy ',0],['Katia',1],['!',0]];let n=0;
+  $('splashHello').innerHTML=parts.map(([txt,em])=>{if(txt==='\n')return '<br>';const h=[...txt].map(c=>`<span class="ch" style="animation-delay:${(2.1+n++*.07).toFixed(2)}s">${c}</span>`).join('');return em?`<em>${h}</em>`:h}).join('');
   const pk=['🌻','✦','🌻','★','✦','🌻'],box=$('spParts');
   for(let i=0;i<18;i++){const e=document.createElement('i');e.textContent=pk[i%pk.length];
     e.style.cssText=`left:${Math.random()*96}%;font-size:${14+Math.random()*22}px;color:${i%2?'#ffd700':'#fff'};animation-duration:${3.2+Math.random()*2.4}s;animation-delay:${.8+Math.random()*3}s;text-shadow:0 2px 6px rgba(0,30,80,.35)`;box.appendChild(e)}
