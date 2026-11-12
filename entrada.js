@@ -27,6 +27,7 @@ function startEntrada(o){
   .fx-z{font:800 20px 'Young Serif',Georgia,serif;color:#0057b7;text-shadow:0 2px 0 #fff}
 .fx-ov .lg.a{animation:fxLeg .22s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 0}.fx-ov .lg.b{animation:fxLeg .22s ease-in-out infinite alternate-reverse;transform-box:fill-box;transform-origin:50% 0}
   @keyframes fxLeg{from{transform:rotate(-25deg)}to{transform:rotate(25deg)}}
+.fx-caca .stink path{animation:fxSteam 1.6s ease-in-out infinite}.fx-caca .stink path:nth-child(2){animation-delay:.5s}.fx-caca .stink path:nth-child(3){animation-delay:1s}
   .fx-hand{transform-origin:50% 90%}
   .fx-face .drool,.fx-face .tear{transform-box:fill-box;transform-origin:50% 0;opacity:0}
   .fx-face .drool.go{animation:fxDrool 2.2s ease-in forwards}
@@ -63,13 +64,16 @@ function startEntrada(o){
     <ellipse class="mO" cx="60" cy="82" rx="5" ry="6" fill="#a8323f" stroke="#3b2a22" stroke-width="1.4" display="none"/>
     <g class="mY" display="none"><ellipse cx="60" cy="83" rx="7.5" ry="9.5" fill="#7a1f2b" stroke="#3b2a22" stroke-width="1.5"/><ellipse cx="60" cy="88" rx="4.5" ry="3" fill="#f07a86"/></g>
     <g class="angry" display="none"><path d="M38 46 Q46 48 53 53" fill="none" stroke="#5a3a22" stroke-width="3.6" stroke-linecap="round"/><path d="M82 46 Q74 48 67 53" fill="none" stroke="#5a3a22" stroke-width="3.6" stroke-linecap="round"/><path d="M51 85 Q60 78 69 85" fill="none" stroke="#3b2a22" stroke-width="2.6" stroke-linecap="round"/><g transform="translate(86 34)" stroke="#e0303a" stroke-width="2.2" stroke-linecap="round"><path d="M-5 -2 Q-2 -2 -2 -5 M2 -5 Q2 -2 5 -2 M5 2 Q2 2 2 5 M-2 5 Q-2 2 -5 2"/></g></g>
+    <g class="sweat" display="none"><path d="M86 36 Q93 47 89.6 51.6 Q87.4 54 84.6 51.8 Q81.4 47.8 86 36Z" fill="#bfe6ff" stroke="#3f8fd0" stroke-width="1.3"/><ellipse cx="85.4" cy="48.6" rx="1.2" ry="2.4" fill="#fff"/></g>
+    <path class="mW" d="M50 83 Q55 79.5 60 83 Q65 86.5 70 83" fill="none" stroke="#3b2a22" stroke-width="2.4" stroke-linecap="round" display="none"/>
     <g class="blush" opacity="0"><ellipse cx="39" cy="73" rx="8" ry="5" fill="#f26b80"/><ellipse cx="81" cy="73" rx="8" ry="5" fill="#f26b80"/></g>
     <g class="drool"><path d="M70.5 79 Q76 87.5 72.6 91.8 Q70.6 93.8 68.4 91.8 Q65.6 87.8 70.5 79Z" fill="#c9ecff" stroke="#4f9fd8" stroke-width="1"/><ellipse cx="69.4" cy="88.6" rx="1" ry="2" fill="#fff"/></g>
     <g class="tear"><path d="M43 68 Q47 74.5 44.6 77.8 Q43 79.4 41.4 77.8 Q39 74.5 43 68Z" fill="#c9ecff" stroke="#4f9fd8" stroke-width="1"/><ellipse cx="42.2" cy="75.6" rx=".8" ry="1.5" fill="#fff"/></g>`;
   svg.appendChild(g);
-  const angryG=g.querySelector('.angry'),brows=[...svg.querySelectorAll('path')].filter(p=>/^M3[89] 5|^M6[78] [45]/.test(p.getAttribute('d')||'')&&p.parentNode!==g),mO=g.querySelector('.mO'),mY=g.querySelector('.mY'),blush=g.querySelector('.blush'),drool=g.querySelector('.drool'),tear=g.querySelector('.tear');
+  const sweatG=g.querySelector('.sweat'),mW=g.querySelector('.mW'),angryG=g.querySelector('.angry'),brows=[...svg.querySelectorAll('path')].filter(p=>/^M3[89] 5|^M6[78] [45]/.test(p.getAttribute('d')||'')&&p.parentNode!==g),mO=g.querySelector('.mO'),mY=g.querySelector('.mY'),blush=g.querySelector('.blush'),drool=g.querySelector('.drool'),tear=g.querySelector('.tear');
   function mouthSet(t){mO.setAttribute('display',t==='O'?'inline':'none');mY.setAttribute('display',t==='Y'?'inline':'none');if(mouth)mouth.setAttribute('display',t?'none':'inline')}
   function angry(on){angryG.setAttribute('display',on?'inline':'none');brows.forEach(b=>b.setAttribute('display',on?'none':'inline'));if(on){if(mouth)mouth.setAttribute('display','none');mO.setAttribute('display','none')}else if(mouth)mouth.setAttribute('display','inline');blush.setAttribute('opacity',on?'.45':'0')}
+  function awkward(on){sweatG.setAttribute('display',on?'inline':'none');mW.setAttribute('display',on?'inline':'none');if(mouth)mouth.setAttribute('display',on?'none':'inline');if(on){mO.setAttribute('display','none');try{sweatG.animate([{transform:'translateY(-4px)',opacity:0},{transform:'translateY(0)',opacity:1},{transform:'translateY(3px)',opacity:1}],{duration:900,fill:'forwards'})}catch(e){}}}
   const fire=el=>{el.classList.remove('go');void el.getBoundingClientRect();el.classList.add('go')};
   let tgt=null,lx=0,ly=0,cross=0,wink=0,lid=1;
   function lookAt(x,y){tgt=x==null?null:{x,y}}
@@ -105,6 +109,12 @@ function startEntrada(o){
       <g fill="url(#fxW)"><circle cx="38" cy="28" r="18"/><circle cx="22" cy="26" r="11"/><circle cx="54" cy="26" r="11"/><circle cx="30" cy="16" r="11"/><circle cx="46" cy="15" r="11"/><circle cx="25" cy="37" r="10"/><circle cx="51" cy="37" r="10"/><circle cx="38" cy="40" r="10"/><circle cx="14" cy="30" r="7"/></g>
       <path d="M24 20 q3 -3 6 0 M36 12 q3 -3 6 0 M46 24 q3 -3 6 0 M30 32 q3 -3 6 0" stroke="rgba(255,255,255,.18)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
       <g transform="translate(62 24)"><ellipse cx="-2" cy="-8" rx="7" ry="3" fill="#2a2326" transform="rotate(-25)"/><ellipse cx="4" cy="2" rx="10" ry="8" fill="#1d181b" transform="rotate(20)"/><circle cx="-1" cy="-6" r="6" fill="#3a3540"/><circle cx="6" cy="0" r="2.3" fill="#fff"/><circle cx="6.6" cy="0.4" r="1.3" fill="#111"/><ellipse cx="12" cy="6" rx="2" ry="1.2" fill="#ff9bb0" opacity=".6"/></g></svg>`,
+    caca:`<svg width="70" height="66" viewBox="0 0 70 66"><defs><linearGradient id="fxK" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a86b3c"/><stop offset="1" stop-color="#6b3d1c"/></linearGradient></defs>
+      <g class="stink" fill="none" stroke="#8bc34a" stroke-width="2" stroke-linecap="round" opacity=".8"><path d="M18 10 q-4 -5 0 -10"/><path d="M35 6 q-4 -5 0 -10"/><path d="M52 10 q-4 -5 0 -10"/></g>
+      <ellipse cx="35" cy="56" rx="30" ry="10" fill="url(#fxK)"/><ellipse cx="35" cy="42" rx="23" ry="9" fill="url(#fxK)"/><ellipse cx="35" cy="30" rx="15" ry="7.5" fill="url(#fxK)"/><path d="M35 23 Q46 20 40 11 Q38 18 31 19 Q28 23 35 23Z" fill="#7a4524"/>
+      <path d="M14 52 Q35 58 56 52 M18 39 Q35 44 52 39 M24 28 Q35 32 46 28" stroke="rgba(255,255,255,.25)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="27" cy="45" rx="5" ry="6" fill="#fff"/><ellipse cx="43" cy="45" rx="5" ry="6" fill="#fff"/><circle cx="28" cy="46" r="3" fill="#2a1a10"/><circle cx="44" cy="46" r="3" fill="#2a1a10"/><circle cx="29" cy="44.8" r="1" fill="#fff"/><circle cx="45" cy="44.8" r="1" fill="#fff"/>
+      <ellipse cx="20" cy="53" rx="4" ry="2.4" fill="#ff8aa0" opacity=".7"/><ellipse cx="50" cy="53" rx="4" ry="2.4" fill="#ff8aa0" opacity=".7"/><path d="M29 54 Q35 60 41 54" fill="#5a1f1f" stroke="#2a1a10" stroke-width="1.4" stroke-linecap="round"/></svg>`,
     hand:`<svg width="42" height="50" viewBox="0 0 42 50"><path d="M12 48 Q6 36 6 26 L6 14 Q6 10 10 10 Q13 10 13 14 L13 22 L14 6 Q14 2 18 2 Q22 2 22 6 L22 22 L23 4 Q23 0 27 0 Q31 0 31 4 L30 22 L32 10 Q32 6 36 6 Q40 7 39 11 L36 30 Q34 44 26 48Z" fill="#f8dccb" stroke="#8a6248" stroke-width="1.4"/></svg>`};
 
   /* ---------- animaciones ---------- */
@@ -174,6 +184,15 @@ function startEntrada(o){
     angry(false);bubble(msg,2600,-40);
     await hop(dir>0?-90:W+90,5);ov.remove();lookAt(null)};
 
+  /* 10. una caca simpática da saltitos por abajo: a Katia le cae una gota de sudor */
+  A.caca=async()=>{const W=innerWidth,H=innerHeight,k1=add(S.caca,'fx-caca'),base=H-58,dir=pick([1,-1]);let x=dir>0?-60:W+60,said=false;
+    const n=9,step=(W+120)/n;
+    for(let i=0;i<n;i++){const a=x,b=x+dir*step;await tween(680,k=>{x=a+(b-a)*k;const air=Math.sin(k*Math.PI),y=base-air*46;const sq=k<.12?1-(.12-k)*2.2:k>.88?1-(k-.88)*2.2:1;
+        put(k1,x-35,y-33,`scale(${(2-sq).toFixed(3)},${sq.toFixed(3)}) ${dir<0?'scaleX(-1)':''}`);k1.style.transformOrigin='35px 66px';lookAt(x,y);
+        if(!said&&(dir>0?x>W*.3:x<W*.7)){said=true;awkward(true);bubble(pick([L('¡Ayyy, Sonia…! 😅','Ой, Соню…! 😅'),L('Ayyy, Sonia… ¡otra vez! 😅','Ой, Соню… знову! 😅'),L('¿Sonia? ¿Has sido tú? 😅','Соню? Це ти? 😅')]),2600,-f2().w*.95)}})}
+    k1.remove();awkward(false);lookAt(null)};
+  const f2=()=>face();
+
   /* ---------- reacciones de Katia ---------- */
   let busy=false,lastAct=performance.now();
   async function yawn(){busy=true;mouthSet('Y');await tween(700,k=>{lid=1-k*.6});const zs=[];const f=face();
@@ -198,13 +217,13 @@ function startEntrada(o){
 
   /* ---------- el director: va turnando las animaciones ---------- */
   const afternoon=hr>=12&&hr<21;
-  const bag=[];const deck=()=>{const all=['choc','basket','chuches','coaster','plane','sun','butterfly','bird','oveja'];if(afternoon)all.push('choc');for(let i=all.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[all[i],all[j]]=[all[j],all[i]]}return all};
+  const bag=[];const deck=()=>{const all=['choc','basket','chuches','coaster','plane','sun','butterfly','bird','oveja','caca'];if(afternoon)all.push('choc');for(let i=all.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[all[i],all[j]]=[all[j],all[i]]}return all};
   async function director(){await wait(4600);if(isGone()||window.__noDirector)return;await dayMood();
     while(!isGone()){if(performance.now()-lastAct>22000&&!busy){await yawn();await wait(1500);continue}
       if(busy){await wait(500);continue}
-      if(!bag.length)bag.push(...deck());const n=bag.shift();busy=true;try{await A[n]()}catch(e){console.error(e)}busy=false;mouthSet(null);angry(false);lookAt(null);cross=0;
+      if(!bag.length)bag.push(...deck());const n=bag.shift();busy=true;try{await A[n]()}catch(e){console.error(e)}busy=false;mouthSet(null);angry(false);awkward(false);lookAt(null);cross=0;
       await wait(rand(2500,4500))}}
   /* bostezo si pasa mucho rato sin tocar nada (se reinicia al tocar) */
   sp.addEventListener('pointerdown',()=>{lastAct=performance.now()},true);
   window.__entrada=A;window.__entradaR={yawn,waveWink,dayMood};director()}
-startEntrada.ver='v36';
+startEntrada.ver='v37';
