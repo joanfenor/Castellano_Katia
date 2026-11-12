@@ -97,7 +97,7 @@ function startEntrada(o){
   const A={};
   /* 1. trozo de chocolate: lo sigue con la mirada y se le cae la baba */
   A.choc=async()=>{const e=add(S.choc),f=face(),dir=pick([1,-1]),W=innerWidth;let drooled=false;
-    await tween(3600,k=>{const x=dir>0?-80+k*(W+160):W+80-k*(W+160),y=f.y-f.w*.62+Math.sin(k*Math.PI*3)*12;put(e,x-35,y-30,`rotate(${Math.sin(k*9)*14}deg)`);lookAt(x,y);
+    await tween(5400,k=>{const x=dir>0?-80+k*(W+160):W+80-k*(W+160),y=f.y-f.w*.62+Math.sin(k*Math.PI*3)*12;put(e,x-35,y-30,`rotate(${Math.sin(k*9)*14}deg)`);lookAt(x,y);
       if(!drooled&&Math.abs(x-f.x)<50){drooled=true;fire(drool)}});e.remove();lookAt(null)};
   /* 2. pelota de baloncesto que acaba en canasta */
   A.basket=async()=>{const f=face(),W=innerWidth,dir=pick([1,-1]);const hp=add(S.hoop);const hx=dir>0?W-96:6,hy=f.top+4;hp.style.opacity=0;hp.style.transformOrigin='0 0';put(hp,hx,hy,(dir<0?'translateX(78px) scaleX(-1) ':'')+'scale(1.15)');
@@ -111,21 +111,21 @@ function startEntrada(o){
     b.remove();await wait(900);hp.style.opacity=0;await wait(450);hp.remove()};
   /* 3. lluvia de chuches: abre la boca, ñam y se pone colorada */
   A.chuches=async()=>{const f=face(),C=[['#ff5fa2','#c21869'],['#4fc3ff','#1272c4'],['#8ee25d','#2f9a24'],['#ffd23f','#d68a00']];const m=svgPt(60,82);
-    const items=[0,1,2,3].map(i=>({e:add(i===3?S.lolly:S.candy(C[i])),x:i===1?m.x:rand(30,innerWidth-30),d:i*380,eat:i===1,r:rand(-1,1)}));mouthSet('O');let ate=false;
-    await tween(3000,k=>{const T=k*3000;for(const it of items){const t=Math.max(0,T-it.d)/1000;let y=-50+t*t*260;if(it.eat&&y>m.y-12){y=m.y-12;if(!ate){ate=true;it.e.style.transition='transform .25s,opacity .25s';it.e.style.opacity=0;mouthSet(null);blush.setAttribute('opacity','.55');bubble(L('¡Ñam! 😋','Ням! 😋'),1500)}}
+    const items=[0,1,2,3].map(i=>({e:add(i===3?S.lolly:S.candy(C[i])),x:i===1?m.x:rand(30,innerWidth-30),d:i*600,eat:i===1,r:rand(-1,1)}));mouthSet('O');let ate=false;
+    await tween(4800,k=>{const T=k*4800;for(const it of items){const t=Math.max(0,T-it.d)/1000;let y=-50+t*t*140;if(it.eat&&y>m.y-12){y=m.y-12;if(!ate){ate=true;it.e.style.transition='transform .25s,opacity .25s';it.e.style.opacity=0;mouthSet(null);blush.setAttribute('opacity','.55');bubble(L('¡Ñam! 😋','Ням! 😋'),1500)}}
       if(!(it.eat&&ate))put(it.e,it.x-20,y-15,`rotate(${it.r*t*200}deg)`)}
       const nx=items.find(it=>!(it.eat&&ate));if(nx&&!ate)lookAt(m.x,m.y-80+k*60)});
     items.forEach(it=>it.e.remove());await wait(400);blush.setAttribute('opacity','0');lookAt(null)};
   /* 4. la montaña rusa de PortAventura */
-  A.coaster=async()=>{const W=innerWidth,f=face(),y0=Math.max(70,f.top-70),lx=W*.58;const d=`M-30 ${y0} L${lx-90} ${y0} C${lx-10} ${y0} ${lx+40} ${y0-20} ${lx+40} ${y0-60} C${lx+40} ${y0-110} ${lx-40} ${y0-110} ${lx-40} ${y0-60} C${lx-40} ${y0-20} ${lx+10} ${y0} ${lx+90} ${y0} L${W+30} ${y0}`;
-    const tr=add(`<svg width="${W}" height="${y0+30}" viewBox="0 0 ${W} ${y0+30}"><path d="${d}" fill="none" stroke="#7a4c22" stroke-width="8" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#c99a62" stroke-width="3" stroke-dasharray="2 9"/></svg>`);tr.style.opacity=0;tr.style.transition='opacity .4s';requestAnimationFrame(()=>tr.style.opacity=1);
+  A.coaster=async()=>{const W=innerWidth,H=innerHeight,f=face(),y0=H-34,lx=W*.58;const d=`M-30 ${y0} L${lx-90} ${y0} C${lx-10} ${y0} ${lx+40} ${y0-20} ${lx+34} ${y0-48} C${lx+34} ${y0-90} ${lx-34} ${y0-90} ${lx-34} ${y0-48} C${lx-40} ${y0-20} ${lx+10} ${y0} ${lx+90} ${y0} L${W+30} ${y0}`;
+    const tr=add(`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><path d="${d}" fill="none" stroke="#7a4c22" stroke-width="8" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#c99a62" stroke-width="3" stroke-dasharray="2 9"/></svg>`);tr.style.opacity=0;tr.style.transition='opacity .4s';requestAnimationFrame(()=>tr.style.opacity=1);
     const path=tr.querySelector('path'),len=path.getTotalLength(),cart=add(S.cart);let shout=false;mouthSet('O');
     await tween(4200,k=>{const s=ease(k)*len,p=path.getPointAtLength(s),q=path.getPointAtLength(Math.min(len,s+2));const a=Math.atan2(q.y-p.y,q.x-p.x)*180/Math.PI;put(cart,p.x-20,p.y-28,`rotate(${a}deg)`);cart.style.transformOrigin='20px 28px';lookAt(p.x,p.y);
       if(!shout&&p.x>lx-60){shout=true;bubble(L('¡Uaaaaa! 🎢','Уааааа! 🎢'),1600);shake()}});
     mouthSet(null);lookAt(null);tr.style.opacity=0;cart.remove();await wait(450);tr.remove()};
   /* 5. avión de papel con una nota de Sonia */
   A.plane=async()=>{const W=innerWidth,f=face(),pl=add(S.plane),note=add(`<div style="background:#fffef6;border:1px solid #e8dfc4;border-radius:4px;padding:5px 9px;font:700 15px/1.1 'Caveat','Segoe Print','Comic Sans MS',cursive;color:#d6336c;box-shadow:0 4px 10px rgba(0,0,0,.2);white-space:nowrap">${L('¡Te quiero, Katia! ♥ Sonia','Я тебе люблю, Катю! ♥ Соня')}</div>`);let said=false;
-    await tween(4600,k=>{const x=W+90-k*(W+340),y=f.top-40+Math.sin(k*Math.PI*2)*30;put(pl,x,y,`rotate(${-10+Math.cos(k*Math.PI*2)*12}deg)`);put(note,x+78,y+8+Math.sin(k*Math.PI*6)*4,`rotate(${Math.sin(k*Math.PI*4)*5}deg)`);lookAt(x+60,y);
+    await tween(6800,k=>{const x=W+90-k*(W+340),y=f.top-40+Math.sin(k*Math.PI*2)*30;put(pl,x,y,`rotate(${-10+Math.cos(k*Math.PI*2)*12}deg)`);put(note,x+78,y+8+Math.sin(k*Math.PI*6)*4,`rotate(${Math.sin(k*Math.PI*4)*5}deg)`);lookAt(x+60,y);
       if(!said&&x<f.x){said=true;blush.setAttribute('opacity','.5');bubble(L('¡Ay, Sonia! 🥰','Ох, Соню! 🥰'),1700)}});
     pl.remove();note.remove();await wait(300);blush.setAttribute('opacity','0');lookAt(null)};
   /* 6. girasoles que crecen y se giran hacia ella */
@@ -163,7 +163,7 @@ function startEntrada(o){
 
   /* ---------- según la hora y según los días ---------- */
   const hr=new Date().getHours();
-  if(hr>=6&&hr<12){const f=face();const m=add(S.mug);m.style.opacity=0;m.style.transition='opacity .6s';put(m,f.left-30,f.bottom-50);setTimeout(()=>m.style.opacity=1,2600)}
+  if(hr>=6&&hr<12){const m=add(S.mug);m.style.opacity=0;m.style.transition='opacity .6s';setTimeout(()=>{const f=face();put(m,Math.max(4,f.left-62),f.y-40);m.style.opacity=1},3200)}
   if(hr>=21||hr<6){const mo=add(S.moon);put(mo,innerWidth-90,40);for(let i=0;i<14;i++){const s=add('✦','fx-star');put(s,rand(8,innerWidth-20),rand(10,innerHeight*.35));s.style.animationDelay=rand(0,1.8)+'s';s.style.fontSize=rand(9,18)+'px'}}
   async function dayMood(){let days={};try{days=JSON.parse(localStorage.getItem('katia-days'))||{}}catch(e){}
     const key=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;const y=new Date();y.setDate(y.getDate()-1);

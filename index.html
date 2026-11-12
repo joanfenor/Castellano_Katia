@@ -744,7 +744,10 @@ $('bkFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{KC.res
   for(let i=0;i<18;i++){const e=document.createElement('i');e.textContent=pk[i%pk.length];
     e.style.cssText=`left:${Math.random()*96}%;font-size:${14+Math.random()*22}px;color:${i%2?'#ffd700':'#fff'};animation-duration:${3.2+Math.random()*2.4}s;animation-delay:${.8+Math.random()*3}s;text-shadow:0 2px 6px rgba(0,30,80,.35)`;box.appendChild(e)}
   $('splashMsg').innerHTML=t('intro');$('splashSkip').textContent=t('skip');
-  let gone=false;const close=()=>{if(gone)return;gone=true;sp.classList.add('out');setTimeout(()=>sp.hidden=true,700)};
+  /* mientras se ve la portada, que el móvil no apague la pantalla */
+  let wl=null;const lock=async()=>{try{if('wakeLock' in navigator&&!gone&&document.visibilityState==='visible')wl=await navigator.wakeLock.request('screen')}catch(e){}};
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')lock()});
+  let gone=false;setTimeout(lock,0);const close=()=>{if(gone)return;gone=true;try{wl&&wl.release();wl=null}catch(e){}sp.classList.add('out');setTimeout(()=>sp.hidden=true,700)};
   sp.addEventListener('click',close);document.addEventListener('keydown',close,{once:true});
   if(window.startEntrada)try{startEntrada({sp,isGone:()=>gone,lang,faceEl:$('splashFace')})}catch(e){console.error(e)}
 
