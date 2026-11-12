@@ -477,6 +477,8 @@ body{padding-top:calc(var(--hdrh,130px) + var(--kcd,0px))}
 .splash-face .drool{transform-box:fill-box;transform-origin:50% 0;opacity:0}
 .splash-face .drool.go{animation:drool 2.2s ease-in forwards}
 @keyframes drool{0%{opacity:1;transform:scale(.15)}35%{opacity:1;transform:scale(1)}55%{transform:scale(.95,1.25) translateY(1px)}80%{opacity:1;transform:translateY(12px) scale(.9)}100%{opacity:0;transform:translateY(22px) scale(.7)}}
+.splash .sver{display:block;margin-top:12px;font:600 11.5px var(--body);color:#9aa6b8;letter-spacing:.04em}
+.splash .sver b{color:#0057b7}
 </style>
 </head>
 <body>
@@ -521,6 +523,7 @@ body{padding-top:calc(var(--hdrh,130px) + var(--kcd,0px))}
     <h2 id="splashHello">¡Hola, <em>Katia</em>!</h2>
     <p id="splashMsg">Poco a poco, el español ya es tuyo. ¡Ánimo!</p>
     <button class="sbtn" id="splashSkip">Empezar →</button>
+    <small class="sver" id="splashVer"><span id="appVer">v35</span><span id="newVer"></span></small>
   </div>
 </div>
 <header>
@@ -749,6 +752,11 @@ $('bkFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{KC.res
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')lock()});
   let gone=false;setTimeout(lock,0);const close=()=>{if(gone)return;gone=true;try{wl&&wl.release();wl=null}catch(e){}sp.classList.add('out');setTimeout(()=>sp.hidden=true,700)};
   sp.addEventListener('click',close);document.addEventListener('keydown',close,{once:true});
+
+  /* versión: la que se está viendo y, si ya se ha descargado otra más nueva, avisarlo */
+  {const mine=$('appVer').textContent;$('appVer').textContent=(lang==='uk'?'версія ':'versión ')+mine;
+   try{caches.keys().then(ks=>{const vs=ks.filter(x=>/^katia-v\d+$/.test(x)).map(x=>x.slice(6)).sort((a,b)=>parseInt(b.slice(1))-parseInt(a.slice(1)));const v=vs[0];
+     if(v&&v!==mine&&parseInt(v.slice(1))>parseInt(mine.slice(1)))$('newVer').innerHTML=lang==='uk'?` · є нова <b>${v}</b>: закрий і відкрий застосунок`:` · hay una nueva, la <b>${v}</b>: cierra y vuelve a abrir la app`})}catch(e){}}
   if(window.startEntrada)try{startEntrada({sp,isGone:()=>gone,lang,faceEl:$('splashFace')})}catch(e){console.error(e)}
 
   {const m=sp.querySelector('.medal'),c=sp.querySelector('.splash-card');if(m&&c){const y=c.getBoundingClientRect().top+m.offsetTop+m.offsetHeight/2;sp.style.setProperty('--mdy',Math.round(innerHeight/2-y)+'px')}}
