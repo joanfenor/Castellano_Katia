@@ -114,9 +114,9 @@ function startEntrada(o){
     await tween(5400,k=>{const x=dir>0?-80+k*(W+160):W+80-k*(W+160),y=f.y-f.w*.62+Math.sin(k*Math.PI*3)*12;put(e,x-35,y-30,`rotate(${Math.sin(k*9)*14}deg)`);lookAt(x,y);
       if(!drooled&&Math.abs(x-f.x)<50){drooled=true;fire(drool)}});e.remove();lookAt(null)};
   /* 2. pelota de baloncesto que acaba en canasta */
-  A.basket=async()=>{const f=face(),W=innerWidth,dir=pick([1,-1]);const hp=add(S.hoop);const hx=dir>0?W-96:6,hy=f.top+4;hp.style.opacity=0;hp.style.transformOrigin='0 0';put(hp,hx,hy,(dir<0?'translateX(78px) scaleX(-1) ':'')+'scale(1.15)');
+  A.basket=async()=>{const f=face(),W=innerWidth,dir=pick([1,-1]);const hp=add(S.hoop);const hx=dir>0?W-100:14,hy=innerHeight*.40;hp.style.opacity=0;hp.style.transformOrigin='0 0';put(hp,hx,hy,(dir<0?'translateX(78px) scaleX(-1) ':'')+'scale(1.15)');
     hp.style.transition='opacity .4s';requestAnimationFrame(()=>hp.style.opacity=1);
-    const b=add(S.ball);const x0=dir>0?-50:W+50,floor=f.bottom+40,rimX=dir>0?hx+30:hx+60,rimY=hy+46;let x=x0,y=floor;
+    const b=add(S.ball);const x0=dir>0?-50:W+50,floor=innerHeight*.62,rimX=dir>0?hx+30:hx+62,rimY=hy+46;let x=x0,y=floor;
     for(let i=0;i<3;i++){const xs=x,xe=x+dir*(W*.17),h=110-i*20;await tween(560,k=>{x=xs+(xe-xs)*k;y=floor-Math.sin(k*Math.PI)*h;put(b,x-22,y-22,`rotate(${k*360*dir}deg)`);lookAt(x,y)})}
     const xs=x,ys=y;await tween(950,k=>{x=xs+(rimX-xs)*k;y=ys+(rimY-6-ys)*k-Math.sin(k*Math.PI)*170;put(b,x-22,y-22,`rotate(${k*540*dir}deg)`);lookAt(x,y)});
     await tween(420,k=>{y=rimY-6+k*60;put(b,rimX-22,y-22);b.style.opacity=k<.7?1:1-(k-.7)/.3});
@@ -207,3 +207,4 @@ function startEntrada(o){
   /* bostezo si pasa mucho rato sin tocar nada (se reinicia al tocar) */
   sp.addEventListener('pointerdown',()=>{lastAct=performance.now()},true);
   window.__entrada=A;window.__entradaR={yawn,waveWink,dayMood};director()}
+startEntrada.ver='v36';

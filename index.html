@@ -523,7 +523,7 @@ body{padding-top:calc(var(--hdrh,130px) + var(--kcd,0px))}
     <h2 id="splashHello">¡Hola, <em>Katia</em>!</h2>
     <p id="splashMsg">Poco a poco, el español ya es tuyo. ¡Ánimo!</p>
     <button class="sbtn" id="splashSkip">Empezar →</button>
-    <small class="sver" id="splashVer"><span id="appVer">v35</span><span id="newVer"></span></small>
+    <small class="sver" id="splashVer"><span id="appVer">v36</span><span id="newVer"></span></small>
   </div>
 </div>
 <header>
@@ -754,7 +754,7 @@ $('bkFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{KC.res
   sp.addEventListener('click',close);document.addEventListener('keydown',close,{once:true});
 
   /* versión: la que se está viendo y, si ya se ha descargado otra más nueva, avisarlo */
-  {const mine=$('appVer').textContent;$('appVer').textContent=(lang==='uk'?'версія ':'versión ')+mine;
+  {const mine=$('appVer').textContent;$('appVer').textContent=(lang==='uk'?'версія ':'versión ')+mine;if(window.startEntrada&&startEntrada.ver!==mine)$('appVer').textContent+=' ('+(lang==='uk'?'анімації ':'animaciones ')+(window.startEntrada&&startEntrada.ver||'?')+')';
    try{caches.keys().then(ks=>{const vs=ks.filter(x=>/^katia-v\d+$/.test(x)).map(x=>x.slice(6)).sort((a,b)=>parseInt(b.slice(1))-parseInt(a.slice(1)));const v=vs[0];
      if(v&&v!==mine&&parseInt(v.slice(1))>parseInt(mine.slice(1)))$('newVer').innerHTML=lang==='uk'?` · є нова <b>${v}</b>: закрий і відкрий застосунок`:` · hay una nueva, la <b>${v}</b>: cierra y vuelve a abrir la app`})}catch(e){}}
   if(window.startEntrada)try{startEntrada({sp,isGone:()=>gone,lang,faceEl:$('splashFace')})}catch(e){console.error(e)}
