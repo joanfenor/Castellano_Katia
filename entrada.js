@@ -120,9 +120,25 @@ function startEntrada(o){
   /* ---------- animaciones ---------- */
   const A={};
   /* 1. trozo de chocolate: lo sigue con la mirada y se le cae la baba */
-  A.choc=async()=>{const e=add(S.choc),f=face(),dir=pick([1,-1]),W=innerWidth;let drooled=false;
-    await tween(5400,k=>{const x=dir>0?-80+k*(W+160):W+80-k*(W+160),y=f.y-f.w*.62+Math.sin(k*Math.PI*3)*12;put(e,x-35,y-30,`rotate(${Math.sin(k*9)*14}deg)`);lookAt(x,y);
-      if(!drooled&&Math.abs(x-f.x)<50){drooled=true;fire(drool)}});e.remove();lookAt(null)};
+  A.choc=async()=>{const f=face(),W=innerWidth,bw=150,bh=112;
+    const bx=Math.min(W-bw-6,f.right-24),by=Math.max(6,f.top-bh-18);
+    const cloud=add(`<svg width="${bw}" height="${bh}" viewBox="0 0 150 112"><path d="M30 92 C10 92 4 70 18 60 C6 44 22 22 42 28 C46 8 74 4 84 20 C98 4 128 12 126 34 C146 38 148 66 130 74 C134 94 108 102 96 92 C86 106 56 106 50 94 C42 100 32 98 30 92Z" fill="#fff" stroke="#c9d6ea" stroke-width="3"/><path d="M34 40 C40 30 54 28 60 34" stroke="#eef3fb" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`);
+    const dots=[0,1,2].map(i=>add(`<div style="width:${10+i*5}px;height:${10+i*5}px;border-radius:50%;background:#fff;border:2.5px solid #c9d6ea"></div>`));
+    const choc=add(S.choc);cloud.style.transformOrigin='30px 95px';
+    const hx=f.x+f.w*.25,hy=f.top+f.w*.12;dots.forEach((d,i)=>{const t=(i+1)/4;put(d,hx+(bx+34-hx)*t-6,hy+(by+bh-14-hy)*t-6,'scale(0)')});
+    put(cloud,bx,by,'scale(0)');put(choc,bx+40,by+26,'scale(0)');choc.style.opacity=0;
+    for(let i=0;i<3;i++){const d=dots[i],t=(i+1)/4;await tween(220,k=>put(d,hx+(bx+34-hx)*t-6,hy+(by+bh-14-hy)*t-6,`scale(${ease(k)})`))}
+    lookAt(bx+bw/2,by+bh/2);await tween(420,k=>put(cloud,bx,by,`scale(${.3+.7*(1-Math.pow(1-k,3))+Math.sin(k*Math.PI)*.08})`));
+    /* poco a poco aparece el chocolate en el pensamiento */
+    let drooled=false;await tween(2600,k=>{choc.style.opacity=k;const fl=Math.sin(k*Math.PI*3)*3;put(choc,bx+40,by+24+fl,`scale(${.35+k*.65}) rotate(${Math.sin(k*6)*6}deg)`);
+      lid=1-k*.18;blush.setAttribute('opacity',(k*.4).toFixed(2));if(!drooled&&k>.55){drooled=true;fire(drool)}});
+    await wait(900);
+    /* ¡PLOP! */
+    const plop=add(`<svg width="120" height="80" viewBox="0 0 120 80"><path d="M60 2 L70 22 L92 10 L86 32 L116 34 L92 48 L108 68 L80 62 L72 78 L60 60 L46 78 L40 60 L10 68 L28 48 L4 36 L32 32 L24 10 L48 22 Z" fill="#ffd23f" stroke="#e0303a" stroke-width="3" stroke-linejoin="round"/><text x="60" y="49" text-anchor="middle" font-family="Figtree,system-ui,sans-serif" font-weight="900" font-size="22" fill="#e0303a" stroke="#fff" stroke-width="1">¡PLOP!</text></svg>`);
+    const px=bx+bw/2-60,py=by+bh/2-40;mouthSet('O');confetti(bx+bw/2,by+bh/2,16);
+    cloud.style.transition=choc.style.transition='opacity .25s';cloud.style.opacity=0;choc.style.opacity=0;dots.forEach(d=>{d.style.transition='opacity .2s';d.style.opacity=0});
+    await tween(700,k=>{put(plop,px,py,`scale(${k<.4?k/.4*1.15:1.15-(k-.4)*.25}) rotate(${-8+k*10}deg)`);plop.style.opacity=k<.7?1:1-(k-.7)/.3});
+    [cloud,choc,plop,...dots].forEach(e=>e.remove());lid=1;blush.setAttribute('opacity','0');mouthSet(null);lookAt(null)};
   /* 2. pelota de baloncesto que acaba en canasta */
   A.basket=async()=>{const f=face(),W=innerWidth,dir=pick([1,-1]);const hp=add(S.hoop);const hx=dir>0?W-100:14,hy=innerHeight*.40;hp.style.opacity=0;hp.style.transformOrigin='0 0';put(hp,hx,hy,(dir<0?'translateX(78px) scaleX(-1) ':'')+'scale(1.15)');
     hp.style.transition='opacity .4s';requestAnimationFrame(()=>hp.style.opacity=1);
@@ -226,4 +242,4 @@ function startEntrada(o){
   /* bostezo si pasa mucho rato sin tocar nada (se reinicia al tocar) */
   sp.addEventListener('pointerdown',()=>{lastAct=performance.now()},true);
   window.__entrada=A;window.__entradaR={yawn,waveWink,dayMood};director()}
-startEntrada.ver='v37';
+startEntrada.ver='v39';

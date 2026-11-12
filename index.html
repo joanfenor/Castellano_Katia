@@ -523,7 +523,7 @@ body{padding-top:calc(var(--hdrh,130px) + var(--kcd,0px))}
     <h2 id="splashHello">¡Hola, <em>Katia</em>!</h2>
     <p id="splashMsg">Poco a poco, el español ya es tuyo. ¡Ánimo!</p>
     <button class="sbtn" id="splashSkip">Empezar →</button>
-    <small class="sver" id="splashVer"><span id="appVer">v37</span><span id="newVer"></span></small>
+    <small class="sver" id="splashVer"><span id="appVer">v39</span><span id="newVer"></span></small>
   </div>
 </div>
 <header>
@@ -608,7 +608,7 @@ const $=id=>document.getElementById(id);
 const ukN=(n,a,b,c)=>{const m10=n%10,m100=n%100;return m10===1&&m100!==11?a:(m10>=2&&m10<=4&&(m100<12||m100>14)?b:c)};
 const I18N={
  es:{title:'El español de Katia',eyebrow:'El español de Katia',hello:'¡Hola,<br><em>Katia</em>!',sub:'¿Qué te apetece practicar hoy?',
-  kV:'Conjugación',dV:'44 verbos, los 15 tiempos y más de 200 frases con Tomas y Sonia.',kW:'Palabras',dW:'Unas 2.000 palabras en 33 temas (colegio, médico, papeles, basket…), con traducción, ejemplos y 10 juegos.',
+  kV:'Conjugación',dV:'44 verbos, los 15 tiempos y más de 200 frases con Tomas y Sonia.',kW:'Palabras',dW:'Casi 2.500 palabras en 43 temas (colegio, médico, cocina, Barcelona, refranes…), con traducción, ejemplos y 10 juegos.',
   kG:'Gramática práctica',tG:'Dudas y situaciones',dG:'Ser o estar, por o para, el pasado, artículos y gustar. Y conversaciones de cada día.',go:'Entrar →',
   todayK:'Hoy',hitsWord:'aciertos',days:n=>n===1?'día seguido':'días seguidos',dailyBtn:'Empezar el repaso de hoy',
   dailyNote:'20 preguntas mezcladas de verbos y vocabulario, empezando por las que más te cuestan.',dailyDone:'¡Repaso de hoy completado! 🌻',
@@ -621,7 +621,7 @@ const I18N={
   splash:['Cada día un poquito más. ¡Tú puedes!','Hoy vas a aprender algo nuevo. ¡Vamos allá!','Poco a poco, el español ya es tuyo. ¡Ánimo!','Equivocarse también es aprender. ¡A por ello!'],
   wd:['L','M','X','J','V','S','D']},
  uk:{title:'Іспанська для Каті',eyebrow:'Іспанська для Каті',hello:'Привіт,<br><em>Катю</em>!',sub:'Що сьогодні потренуємо?',
-  kV:'Дієвідмінювання',dV:'44 дієслова, усі 15 часів і понад 200 речень про Томаса і Соню.',kW:'Слова',dW:'Близько 2000 слів у 33 темах (школа, лікар, документи, баскетбол…), з перекладом, прикладами і 10 іграми.',
+  kV:'Дієвідмінювання',dV:'44 дієслова, усі 15 часів і понад 200 речень про Томаса і Соню.',kW:'Слова',dW:'Майже 2500 слів у 43 темах (школа, лікар, кухня, Барселона, прислів’я…), з перекладом, прикладами і 10 іграми.',
   kG:'Практична граматика',tG:'Труднощі та ситуації',dG:'Ser чи estar, por чи para, минулий час, артиклі та gustar. І щоденні розмови.',go:'Увійти →',
   todayK:'Сьогодні',hitsWord:'правильних',days:n=>ukN(n,'день поспіль','дні поспіль','днів поспіль'),dailyBtn:'Почати повторення дня',
   dailyNote:'20 змішаних запитань з дієслів і слів — спочатку ті, що даються найважче.',dailyDone:'Повторення дня виконано! 🌻',
